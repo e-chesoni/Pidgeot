@@ -7,9 +7,6 @@ class Tail(Aerofoil):
         pass
     
     # Setters
-    def set_elevator_chord(self, n):
-        self._elevator_chord = n
-    
     def set_tail_thickness(self, n):
         self._tail_thickness = n
     
@@ -45,8 +42,7 @@ class Tail(Aerofoil):
     # NOTE: Cet/CLt = 0.2/0.5
     # NOTE: use find_epsilon before this function
     def find_CL(self, alpha_test_rad, del_e_rad, i_h):
-        i_h = 0 # Bruce said we could do this
-        return self.NACA.find_a3D() * (alpha_test_rad + (self.get_tau() * del_e_rad) - self.get_epsilon() + i_h)
+        return self._NACA.find_a3D() * (alpha_test_rad + (self.get_tau() * del_e_rad) - self.get_epsilon() + i_h)
     
     def find_CM(self, surface_area_tail, surface_area_wing, chord_wing, CL_tail):
         return (-self.find_CV(surface_area_tail, surface_area_wing, chord_wing)) * CL_tail

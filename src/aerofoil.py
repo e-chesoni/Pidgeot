@@ -1,6 +1,8 @@
+import math
+
 class Aerofoil:
     def __init__(self) -> None:
-        self.NACA = None
+        self._NACA = None
         self._span = None
         self._chord = None
         self._thickness = None
@@ -17,7 +19,7 @@ class Aerofoil:
         self._thickness = n
     
     def set_NACA(self, NACA):
-        self.NACA = NACA
+        self._NACA = NACA
 
     # Getters
     def get_span(self):
@@ -32,10 +34,16 @@ class Aerofoil:
     def get_AR(self):
         return self._span / self._chord
     
+    def get_NACA(self):
+        return self._NACA
+    
     # Common calculations
     # TODO: Is this formula correct?
     def find_CD_NACA(self):
-        return self.NACA.find_CD()
+        return self._NACA.find_CD()
+    
+    def find_CD(self, CL):
+        return self.get_NACA()._Cd0 + (self.get_NACA().get_r() * (CL**2)) + ((CL**2) / (math.pi * self.get_NACA()._e * self.get_NACA()._AR))
     
     # Export vairables
     def export_variables_to_dict(self):
