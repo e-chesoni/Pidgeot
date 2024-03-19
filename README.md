@@ -1,7 +1,7 @@
-# Pidgeot UAV Project
+# Pidgeot
 
 ## Overview
-Welcome to the Pidgeot UAV Project! This repository is dedicated to the development and exploration of advanced UAV (Unmanned Aerial Vehicle) technologies. Inspired by the swift and keen-eyed Pokémon Pidgeot, our project aims to embody the agility, speed, and precision of its namesake in the realm of aerial vehicles.
+Welcome to the Pidgeot (a UAV simulator project)! This repository is dedicated to the development and exploration of advanced UAV (Unmanned Aerial Vehicle) technologies. Inspired by the swift and keen-eyed Pokémon Pidgeot, our project aims to embody the agility, speed, and precision of its namesake in the realm of aerial vehicles.
 
 ## Objectives
 - To develop UAV systems that excel in speed, efficiency, and reliability.
