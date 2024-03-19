@@ -63,7 +63,7 @@ if DEBUG:
 super_cub = Aircraft("Super Cub", super_cub_wing, super_cub_tail, super_cub_fuselage)
 
 # Enable debugging on aircraft
-super_cub.set_log_level(2)
+super_cub.set_log_level(1)
 
 # Set variables on aircraft for testing
 super_cub.set_i_h(i_h_test_value)

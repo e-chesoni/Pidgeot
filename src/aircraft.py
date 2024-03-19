@@ -115,9 +115,9 @@ class Aircraft:
             print_info_table(fuselage_info, "FUSELAGE INFORMATION")
         
         elif self._log_level == 2:
-            #logging.info(f"Total CL: {CL}")
+            logging.info(f"Total CL: {CL}")
             logging.info(f"Total CD: {CD}")
-            #logging.info(f"Total CM: {CM}")
+            logging.info(f"Total CM: {CM}")
 
         # NOTE: PAY ATTENTION TO RETURN ORDER HERE!!
         return AeroCoefficients(CL=CL, CD=CD, CM=CM)
