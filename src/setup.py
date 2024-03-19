@@ -1,3 +1,5 @@
+import numpy as np
+
 from util.helpers import *
 from src.NACA import *
 from util.uav_logger import *
@@ -66,8 +68,10 @@ e_tail = 0.6 # WAG
 # NOTE: Define test measurements in a dictionary
 test_measurements = {
     "Test Alpha (degrees)": 30, # NOTE: for main impl: alpha range -30 to 30 (-0.524 - 0.524 in rads) intervals of 5
-    "Test h": 0.25,
+    "Test Alpha Range (degrees)": np.linspace(-10, 30, 21),
     "Test Delta_e (degrees)": 20,
+    "Test Delta_e List (degrees)": [0, 5, 10],
+    "Test Reynolds Number": 6e5,
+    "Test h": 0.25,
     "Test i_h": 0,
-    "Test Reynolds Number": 2 * (10**5)
 }

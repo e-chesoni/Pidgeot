@@ -1,4 +1,5 @@
 import logging
+import numpy as np
 
 # Log Levels
 # NOTSET    = 0
@@ -18,7 +19,7 @@ logging.basicConfig(level=logging.DEBUG,
 
 def print_info_table(info_dict, title="INFORMATION"):
     """
-    Prints a table of information based on a dictionary input, handling None values.
+    Prints a table of information based on a dictionary input, handling None values and lists differently.
 
     Parameters:
     - info_dict: A dictionary where keys are property names (as strings) and values are the corresponding values.
@@ -31,7 +32,7 @@ def print_info_table(info_dict, title="INFORMATION"):
     # Calculate the maximum width for the property column based on the longest key
     max_key_length = max(len(key) for key in info_dict.keys())
     property_width = max(max_key_length, len("Property")) + 5  # Add some padding
-    value_width = 15
+    value_width = 25  # Adjusted to potentially accommodate longer list representations
 
     header = f"{'Property':<{property_width}} | {'Value':<{value_width}}"
     divider = "-" * (property_width + value_width + 3)  # 3 for " | " separator and extra space
@@ -43,7 +44,15 @@ def print_info_table(info_dict, title="INFORMATION"):
 
     for key, value in info_dict.items():
         # Check if value is None and replace it with the string "None"
-        display_value = "None" if value is None else value
+        if value is None:
+            display_value = "None"
+        elif isinstance(value, list) or isinstance(value, np.ndarray):
+            if len(value) > 3:
+                display_value = f"[{value[0]}, ..., {value[-1]}]"  # Show start and end for long lists
+            else:
+                display_value = str(value)  # Convert short lists directly to string
+        else:
+            display_value = value
         logging.info(f"{key:<{property_width}} | {display_value:<{value_width}}")
-
+    
     print("\n")

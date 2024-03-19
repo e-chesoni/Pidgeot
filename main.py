@@ -24,11 +24,14 @@ print("\n")
 
 # Test Values
 alpha_deg_test_value = test_measurements["Test Alpha (degrees)"]
-h_test_value = test_measurements["Test h"]
+alpha_range_deg_test_value = test_measurements["Test Alpha Range (degrees)"]
 delta_e_deg_test_value = test_measurements["Test Delta_e (degrees)"]
-Reynolds_test = test_measurements["Test Reynolds Number"]
+delta_e_list_deg_test_value = test_measurements["Test Delta_e List (degrees)"]
+Reynolds_test_value = test_measurements["Test Reynolds Number"]
 i_h_test_value = test_measurements["Test i_h"]
+h_test_value = test_measurements["Test h"]
 
+# PROBLEM 1
 # WING
 super_cub_wing = Wing()
 super_cub_wing.set_span(in_to_meters(wing_span_in))
@@ -72,16 +75,39 @@ super_cub.set_tail_surface_area_in(tail_surface_area_in)
 super_cub.set_wing_chord_in(wing_chord_in)
 
 # Run simulation
-super_cub.simulate(alpha_deg_test_value, delta_e_deg_test_value, Reynolds_test, h_test_value)
-
-# Define Test Parameters
-alpha_range = np.linspace(-10, 30, 21)  # alpha range: -2 to 6 degrees -> 0 - 0.1 radians
-del_e_degs = [0, 5, 10]  # TEST elevator deflections
-Re_c = 1e6  # TEST Reynolds number (YOU CAN CHANGE THIS)
-h = -0.25  # h range: 0.25 - 1
+super_cub.simulate(alpha_deg_test_value, delta_e_deg_test_value, Reynolds_test_value, h_test_value)
 
 # Call plotting function
-super_cub.plot_aero_curves(alpha_range, del_e_degs, Re_c, h)
+super_cub.plot_aero_curves(alpha_range_deg_test_value, delta_e_list_deg_test_value, Reynolds_test_value, h_test_value)
+
+# PROBLEM 2
+# Find trimmed elevator angle for a range of angles of attack
+trimmed_data = []
+
+# NOTE: Print statements causes lambda function to fail; need to turn them off for P2
+super_cub.set_log_level(3)
+
+for alpha_deg in alpha_range_deg_test_value:
+    f_CM = lambda del_e_deg: super_cub.simulate(alpha_deg, del_e_deg, Reynolds_test_value, h_test_value)[-1]  # Access CM directly
+    print(f_CM)
+    del_e_deg_trim = fsolve(f_CM, 0)[0]
+    # Now unpack the returned values in the order of CL, CD, CM
+    result = super_cub.simulate(alpha_deg, del_e_deg_trim, Reynolds_test_value, h_test_value)
+    CL, CD, CM = result.CL, result.CD, result.CM
+    trimmed_data.append((CM, CL, CD))
+
+# Extract CL and CD for curve fitting
+CL_data = [data[1] for data in trimmed_data]
+CD_data = [data[2] for data in trimmed_data]
+
+# Fit the parabolic drag polar equation
+def drag_polar(CL, Cd0, K):
+    return Cd0 + K * CL**2
+
+popt, pcov = curve_fit(drag_polar, CL_data, CD_data)
+Cd0, K = popt
+
+print(f"Cd0: {Cd0}, K: {K}")
 
 # TODO: Stall speed should be 9 or 8 m/s
 # TODO: get this from CL vs alpha (~1.4) if you assume higher, you'll just get something that flys slower 
