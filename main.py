@@ -30,6 +30,7 @@ delta_e_list_deg_test_value = test_measurements["Test Delta_e List (degrees)"]
 Reynolds_test_value = test_measurements["Test Reynolds Number"]
 i_h_test_value = test_measurements["Test i_h"]
 h_test_value = test_measurements["Test h"]
+critical_angle_of_attack_test_value = test_measurements["Test Critical Angle of Attack (degrees)"] # TODO: FIX ME; doesnt work for some reason
 velocity_range_ms_test_value = test_measurements["Test Velocity Range (m/s)"]
 rho_test_value = test_measurements["Test Air Density (kg/m^3)"]
 
@@ -75,16 +76,18 @@ super_cub.set_i_h(i_h_test_value)
 super_cub.set_wing_surface_area_in(wing_surface_area_in)
 super_cub.set_tail_surface_area_in(tail_surface_area_in)
 super_cub.set_wing_chord_in(wing_chord_in)
+super_cub.set_critical_angle_of_attack(critical_angle_of_attack_test_value)
 
 # Run simulation
 super_cub.simulate(alpha_deg_test_value, delta_e_deg_test_value, Reynolds_test_value, h_test_value)
 
 # Call plotting function
-super_cub.plot_aero_curves(alpha_range_deg_test_value, delta_e_list_deg_test_value, Reynolds_test_value, h_test_value)
+cl_max_list = super_cub.plot_aero_curves(alpha_range_deg_test_value, delta_e_list_deg_test_value, Reynolds_test_value, h_test_value)
+logging.info(f"CL_max: {cl_max_list[0]}")
+#TODO: add max values to plot, remove redundant log below
 
 # PROBLEM 2
 # Find trimmed elevator angle for a range of angles of attack
-
 # NOTE: Print statements causes lambda function to fail; need to turn them off for P2
 super_cub.set_log_level(3)
 
@@ -94,10 +97,9 @@ logging.info(f"Cd0: {Cd0}, K: {K}")
 # PROBLEM 3
 super_cub.set_trimmed_drag_polar_coefficients(Cd0, K)
 super_cub.set_weight(kg_to_g(super_cub_weight_kg))
-
-T_values, P_values = super_cub.find_thrust_power(velocity_range_ms_test_value, rho_test_value)
 super_cub.plot_thrust_and_power(rho_test_value, velocity_range_ms_test_value)
+logging.info(f"CL_max: {cl_max_list[0]}")
 
 # TODO: Stall speed should be 9 or 8 m/s
 # TODO: get this from CL vs alpha (~1.4) if you assume higher, you'll just get something that flys slower 
-    # CL max = stall 
+    # CL max = stall

@@ -76,6 +76,7 @@ test_measurements = {
     "Test Reynolds Number": 6e5,
     "Test h": 0.25,
     "Test i_h": 0,
+    "Test Critical Angle of Attack (degrees)": 12,
     "Test Velocity Range (m/s)": np.linspace(0, 30, 100),
     "Test Air Density (kg/m^3)": 1.225,
 }

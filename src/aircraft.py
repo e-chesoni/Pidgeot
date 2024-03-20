@@ -27,6 +27,13 @@ class Aircraft:
         self._wing = wing
         self._tail = tail
         self._fuselage = fuselage
+    
+    # Logging
+    def enable_debug(self, debug):
+        self._debug_enabled = debug
+    
+    def set_log_level(self, level):
+        self._log_level = level
 
     # Setters
     def set_i_h(self, i_h):
@@ -41,14 +48,11 @@ class Aircraft:
     def set_wing_chord_in(self, wing_chord_in):
         self._wing_chord_in = wing_chord_in
 
-    def enable_debug(self, debug):
-        self._debug_enabled = debug
-    
-    def set_log_level(self, level):
-        self._log_level = level
-
     def set_weight(self, weight):
         self._weight = weight
+
+    def set_critical_angle_of_attack(self, crit_angle):
+        self._critical_angle_of_attack = crit_angle
     
     def set_trimmed_drag_polar_coefficients(self, Cd0, K):
         self._Cd0 = Cd0
@@ -65,7 +69,19 @@ class Aircraft:
         AeroCoefficients = namedtuple('AeroCoefficients', 'CL CD CM')
         
         # WING
-        CL_wing = self._wing.find_CL_NACA(deg_to_rad(alpha_deg))
+        alpha_rad = deg_to_rad(alpha_deg)
+        critical_alpha_rad = deg_to_rad(self._critical_angle_of_attack)
+        
+        # Adjust CL calculation for stall behavior
+        if alpha_rad <= critical_alpha_rad:
+            CL_wing = self._wing.find_CL_NACA(alpha_rad)
+        else:
+            # Simplified stall behavior: CL starts to decrease or remains constant
+            # This is a placeholder; adjust based on your stall model
+            #decrease_factor = 5 * (alpha_rad - critical_alpha_rad)
+            decrease_factor = 0
+            CL_wing = self._wing.find_CL_NACA(critical_alpha_rad) - decrease_factor
+
         #CD_wing = self._wing.find_CD_NACA()
         CD_wing = self._wing.find_CD(CL_wing)
         CM_wing = self._wing.find_CM(h)
@@ -146,6 +162,8 @@ class Aircraft:
         # Define a list of colors for the plots
         palette_1 = [dark_blue, navy, teal]
         palette_2 = [yellow, burnt_orange, dark_red]
+
+        cl_max_list = []
         
         plt.figure(figsize=(12, 12))
 
@@ -163,10 +181,31 @@ class Aircraft:
                 CD_values.append(CD)
                 CM_values.append(CM)
             
+            # Find CL_max and corresponding alpha
+            CL_max = max(CL_values)
+            alpha_at_CL_max = alpha_range[CL_values.index(CL_max)]
+            
             # Cycle through colors
             color1 = palette_1[i % len(palette_1)]
             color2 = palette_2[i % len(palette_1)]
+            #ax1.plot(alpha_range, CL_values, '-o', label=f'CL vs Alpha, del_e={del_e_deg}', color=color1)
+
+            # Plotting modifications
             ax1.plot(alpha_range, CL_values, '-o', label=f'CL vs Alpha, del_e={del_e_deg}', color=color1)
+            # Add critical angle of attack marker
+            crit_angle = self._critical_angle_of_attack
+            ax1.axvline(x=crit_angle, color='grey', linestyle='--', label='Critical Angle of Attack')
+            # Find the index of the closest alpha value to the critical angle
+            #crit_index = np.abs(alpha_range - crit_angle).argmin()
+
+            # For each del_e_deg, find CL at the critical angle
+            for i, del_e_deg in enumerate(del_e_degs):
+                CL_at_crit_angle = self.simulate(crit_angle, del_e_deg, Re_c, h)[0]
+                cl_max_list.append(CL_at_crit_angle)
+                # Highlight CL at the critical angle on the plot
+                ax1.plot(crit_angle, CL_at_crit_angle, 'x', color='red', label=f'CL at Crit Angle, del_e={del_e_deg}')
+
+
             ax2.plot(alpha_range, CM_values, '--', label=f'CM vs Alpha, del_e={del_e_deg}', color=color2)
         
         ax1.set_xlabel('Alpha (degrees)')
@@ -202,6 +241,8 @@ class Aircraft:
 
         plt.tight_layout()
         plt.show()
+
+        return cl_max_list
 
     def find_trimmed_drag_polar_coefficients(self, alpha_range, Re_c, h):
         trimmed_data = []
