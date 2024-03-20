@@ -6,6 +6,8 @@ from util.uav_logger import *
 from collections import namedtuple
 from typing import Union
 import matplotlib.pyplot as plt
+from scipy.optimize import fsolve
+from scipy.optimize import curve_fit
 
 # colors
 dark_blue = '#001219'
@@ -44,6 +46,13 @@ class Aircraft:
     
     def set_log_level(self, level):
         self._log_level = level
+
+    def set_weight(self, weight):
+        self._weight = weight
+    
+    def set_trimmed_drag_polar_coefficients(self, Cd0, K):
+        self._Cd0 = Cd0
+        self._K = K
 
     # Simulation Methods
     def simulate(self, alpha_deg, del_e_deg, Re_c, h):
@@ -192,4 +201,79 @@ class Aircraft:
         plt.legend()
 
         plt.tight_layout()
+        plt.show()
+
+    def find_trimmed_drag_polar_coefficients(self, alpha_range, Re_c, h):
+        trimmed_data = []
+        for alpha_deg in alpha_range:
+            f_CM = lambda del_e_deg: self.simulate(alpha_deg, del_e_deg, Re_c, h)[-1]  # Access CM directly
+            print(f_CM)
+            del_e_deg_trim = fsolve(f_CM, 0)[0]
+            # Now unpack the returned values in the order of CL, CD, CM
+            result = self.simulate(alpha_deg, del_e_deg_trim, Re_c, h)
+            CL, CD, CM = result.CL, result.CD, result.CM
+            trimmed_data.append((CM, CL, CD))
+
+        # Extract CL and CD for curve fitting
+        CL_data = [data[1] for data in trimmed_data]
+        CD_data = [data[2] for data in trimmed_data]
+
+        # Fit the parabolic drag polar equation
+        def drag_polar(CL, Cd0, K):
+            return Cd0 + K * CL**2
+
+        popt, pcov = curve_fit(drag_polar, CL_data, CD_data)
+        Cd0, K = popt
+
+        return Cd0, K
+
+    def find_trimmed_CL(self, V, weight, rho):
+        g = 9.81
+        return (2 * weight * g) / (rho * V**2 * self._wing_surface_area_in)
+
+    def find_trimmed_drag(self, CL):
+        return self._Cd0 + self._K * CL**2
+    
+    def find_thrust_power(self, V, rho):
+        trimmed_CL = self.find_trimmed_CL(self._weight, rho, V)
+        trimmed_CD = self.find_trimmed_drag(trimmed_CL)
+        D = 0.5 * rho * V**2 * self._wing_surface_area_in * trimmed_CD  # Drag = Thurst
+        P = D * V  # Power
+        return D, P
+    
+    def plot_thrust_and_power(self, rho, V_range):
+        thrust = []
+        power = []
+        
+        for V in V_range:
+            T, P = self.find_thrust_power(V, rho)
+            thrust.append(T)
+            power.append(P)
+
+        # Plotting
+        fig, ax1 = plt.subplots()
+
+        ax1.set_xlabel('Velocity (m/s)')
+        ax1.set_ylabel('Thrust (N)', color=navy)
+        ax1.plot(V_range, thrust, color=navy)
+        ax1.tick_params(axis='y', labelcolor=navy)
+        # Invert the y-axis for thrust
+        #ax1.invert_yaxis()
+
+        ax2 = ax1.twinx() # instantiate a second axes that shares the same x-axis
+
+        ax2.set_ylabel('Power (W)', color=burnt_orange)  # we already handled the x-label with ax1
+        ax2.plot(V_range, power, color=burnt_orange)
+        ax2.tick_params(axis='y', labelcolor=burnt_orange)
+        # Invert the y-axis for power
+        #ax2.invert_yaxis()
+
+        # Find min thrust required and corresponding velocity
+        min_thrust = min(thrust)
+        min_speed_index = thrust.index(min_thrust)
+        min_speed = V_range[min_speed_index]
+
+        plt.title(f'Thrust vs Power for Level Flight')
+        fig.tight_layout()  # fix y axis clipping
+
         plt.show()

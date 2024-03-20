@@ -7,6 +7,8 @@ from util.helpers import *
 from src.aircraft import *
 
 # NOTE: Do not put conversions in setup
+# Super Cub Parameters
+super_cub_weight_kg = 750
 
 # Wing parameters
 wing_span_in = 47
@@ -74,4 +76,6 @@ test_measurements = {
     "Test Reynolds Number": 6e5,
     "Test h": 0.25,
     "Test i_h": 0,
+    "Test Velocity Range (m/s)": np.linspace(0, 30, 100),
+    "Test Air Density (kg/m^3)": 1.225,
 }

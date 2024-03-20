@@ -30,6 +30,8 @@ delta_e_list_deg_test_value = test_measurements["Test Delta_e List (degrees)"]
 Reynolds_test_value = test_measurements["Test Reynolds Number"]
 i_h_test_value = test_measurements["Test i_h"]
 h_test_value = test_measurements["Test h"]
+velocity_range_ms_test_value = test_measurements["Test Velocity Range (m/s)"]
+rho_test_value = test_measurements["Test Air Density (kg/m^3)"]
 
 # PROBLEM 1
 # WING
@@ -82,32 +84,18 @@ super_cub.plot_aero_curves(alpha_range_deg_test_value, delta_e_list_deg_test_val
 
 # PROBLEM 2
 # Find trimmed elevator angle for a range of angles of attack
-trimmed_data = []
 
 # NOTE: Print statements causes lambda function to fail; need to turn them off for P2
 super_cub.set_log_level(3)
 
-for alpha_deg in alpha_range_deg_test_value:
-    f_CM = lambda del_e_deg: super_cub.simulate(alpha_deg, del_e_deg, Reynolds_test_value, h_test_value)[-1]  # Access CM directly
-    print(f_CM)
-    del_e_deg_trim = fsolve(f_CM, 0)[0]
-    # Now unpack the returned values in the order of CL, CD, CM
-    result = super_cub.simulate(alpha_deg, del_e_deg_trim, Reynolds_test_value, h_test_value)
-    CL, CD, CM = result.CL, result.CD, result.CM
-    trimmed_data.append((CM, CL, CD))
+Cd0, K = super_cub.find_trimmed_drag_polar_coefficients(alpha_range_deg_test_value, Reynolds_test_value, h_test_value)
+logging.info(f"Cd0: {Cd0}, K: {K}")
 
-# Extract CL and CD for curve fitting
-CL_data = [data[1] for data in trimmed_data]
-CD_data = [data[2] for data in trimmed_data]
+super_cub.set_trimmed_drag_polar_coefficients(Cd0, K)
+super_cub.set_weight(kg_to_g(super_cub_weight_kg))
 
-# Fit the parabolic drag polar equation
-def drag_polar(CL, Cd0, K):
-    return Cd0 + K * CL**2
-
-popt, pcov = curve_fit(drag_polar, CL_data, CD_data)
-Cd0, K = popt
-
-print(f"Cd0: {Cd0}, K: {K}")
+T_values, P_values = super_cub.find_thrust_power(velocity_range_ms_test_value, rho_test_value)
+super_cub.plot_thrust_and_power(rho_test_value, velocity_range_ms_test_value)
 
 # TODO: Stall speed should be 9 or 8 m/s
 # TODO: get this from CL vs alpha (~1.4) if you assume higher, you'll just get something that flys slower 
