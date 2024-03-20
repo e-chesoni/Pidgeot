@@ -91,6 +91,7 @@ super_cub.set_log_level(3)
 Cd0, K = super_cub.find_trimmed_drag_polar_coefficients(alpha_range_deg_test_value, Reynolds_test_value, h_test_value)
 logging.info(f"Cd0: {Cd0}, K: {K}")
 
+# PROBLEM 3
 super_cub.set_trimmed_drag_polar_coefficients(Cd0, K)
 super_cub.set_weight(kg_to_g(super_cub_weight_kg))
 
