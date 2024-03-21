@@ -205,7 +205,6 @@ class Aircraft:
                 # Highlight CL at the critical angle on the plot
                 ax1.plot(crit_angle, CL_at_crit_angle, 'x', color='red', label=f'CL at Crit Angle, del_e={del_e_deg}')
 
-
             ax2.plot(alpha_range, CM_values, '--', label=f'CM vs Alpha, del_e={del_e_deg}', color=color2)
         
         ax1.set_xlabel('Alpha (degrees)')

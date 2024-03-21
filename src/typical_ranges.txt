@@ -1,0 +1,15 @@
+AR: (faster) 0.6 - 0.7 (larger)
+adding simple flap = top curve of NACA graph on left
+
+Landing speed
+- acceleration * 60m
+- a = 0.4
+- (0.4) * (60m) (2) = V_L^2
+- ~24m/s landing speed
+
+Tail sizing
+- Can look up tail sizing for different set_trimmed_drag_polar_coefficients
+- V_H = l_t * S_t / c * S ~ 0.5
+- 0.3 - 0.1
+
+Want full plane cg close to quarter chord on wing
