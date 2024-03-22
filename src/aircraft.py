@@ -23,6 +23,7 @@ dark_red = '#9b2226'
 
 class Aircraft:
     def __init__(self, name, wing, tail, fuselage):
+        logging.info(f"Aircraft named \"{name}\" created")
         self._name = name
         self._wing = wing
         self._tail = tail
@@ -34,13 +35,26 @@ class Aircraft:
     
     def set_log_level(self, level):
         self._log_level = level
-
+    
+    # Getters
+    def get_W0(self):
+        return self._W0
+    
+    def get_Wp(self):
+        return self._Wp
+    
+    def get_wing_surface_area_m(self):
+        return self._wing_surface_area_m
+    
     # Setters
     def set_i_h(self, i_h):
         self._i_h = i_h
 
     def set_wing_surface_area_in(self, wing_surface_area_in):
         self._wing_surface_area_in = wing_surface_area_in
+    
+    def set_wing_surface_area_m(self, wing_surface_area_m):
+        self._wing_surface_area_m = wing_surface_area_m
     
     def set_tail_surface_area_in(self, tail_surface_area_in):
         self._tail_surface_area_in = tail_surface_area_in
@@ -57,6 +71,21 @@ class Aircraft:
     def set_trimmed_drag_polar_coefficients(self, Cd0, K):
         self._Cd0 = Cd0
         self._K = K
+
+    # We = wmpty weight
+    def set_We_over_W0(self, val):
+        self._We_over_W0 = val
+    
+    # Wf = fuel weight
+    def set_Wf_over_W0(self, val):
+        self._Wf_over_W0 = val
+    
+    # Wp = payload weight
+    def set_Wp(self, Wp):
+        self._Wp = Wp
+    
+    def set_W0(self, W0):
+        self._W0 = W0
 
     # Simulation Methods
     def simulate(self, alpha_deg, del_e_deg, Re_c, h):
@@ -317,3 +346,31 @@ class Aircraft:
         fig.tight_layout()  # fix y axis clipping
 
         plt.show()
+
+    def find_Wf_over_W0(self, Range, H_F, L_over_d, eta_p):
+        return ( Range / H_F ) * ( 1 / L_over_d ) * ( 1 / eta_p)
+    
+    def find_total_weight(self):
+        return ( self._Wp / (1 - self._Wf_over_W0 - self._We_over_W0))
+    
+    def find_Wp(self):
+        print(self._Wf_over_W0)
+        print(self._We_over_W0)
+        return (1 - self._Wf_over_W0 - self._We_over_W0) * self._W0
+    
+    def find_wing_surface_area(self, rho, V, CL):
+        g = 9.81
+        return ( ( 2 * self._W0 * g) / ( rho * (V**2) * CL ) )
+    
+    def calculate_wing_dimensions_m(self):
+        # Define a l/w ratio for the wing
+        length_to_width_ratio = 3  # This means the length is 3 times the width
+
+        # area = length * width, so width = sqrt(area / ratio)
+        width = math.sqrt(self._wing_surface_area_m / length_to_width_ratio)
+
+        # find length
+        length = width * length_to_width_ratio
+
+        return length, width
+

@@ -13,6 +13,7 @@
       "alpha_end_deg": 4,
       "e": 0.7
     },
+
     "NACA_0009": {
       "Cd": 0.014,
       "Cd0": 0.009,
@@ -23,6 +24,18 @@
       "alpha_start_deg": 0,
       "alpha_end_deg": 4,
       "e": 0.6
+    },
+    
+    "NACA_4415": {
+      "Cd": 0.02,
+      "Cd0": 0.012,
+      "CL": 0.9,
+      "alpha_0_deg": -1,
+      "CL_start": 0.3,
+      "CL_end": 0.7,
+      "alpha_start_deg": -1,
+      "alpha_end_deg": 5,
+      "e": 0.75
     }
   }
   
