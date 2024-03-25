@@ -31,7 +31,6 @@ super_cub_wing = Wing()
 super_cub_wing.set_span(in_to_meters(wing_span_in))
 super_cub_wing.set_chord(in_to_meters(wing_chord_in))
 super_cub_wing.set_center_of_gravity(wing_center_of_gravity)
-
 # NACA WING parameters
 super_cub_wing.set_NACA_from_data("2415", naca_data)
 
@@ -39,12 +38,8 @@ super_cub_wing.set_NACA_from_data("2415", naca_data)
 super_cub_tail = Tail()
 super_cub_tail.set_span(in_to_meters(tail_span_in))
 super_cub_tail.set_chord(in_to_meters(tail_chord_in))
-
-super_cub_wing.set_NACA_from_data("0009", naca_data)
-NACA_0009 = NACA("0009", Cd_0009, CL_0009, Cd0_0009, deg_to_rad(alpha_0_0009_deg), super_cub_tail.get_AR(), e_tail)
-NACA_0009.set_CL_window(CL_0009_start, CL_0009_end)
-NACA_0009.set_alpha_window(alpha_0009_start_deg, alpha_0009_end_deg) # NOTE: OK to use degrees here; converted to rad in a_2D calc
-super_cub_tail.set_NACA(NACA_0009)
+# NACA TAIL parameters
+super_cub_tail.set_NACA_from_data("0009", naca_data)
 
 # Additional tail parameters
 super_cub_tail.set_tau(tau)
@@ -60,7 +55,7 @@ def run_hw4_simulation():
         print_info_table(test_measurements, "TEST MEASUREMENTS INFORMATION")
 
     # AIRCRAFT
-    super_cub = Aircraft("Super Cub", super_cub_wing, super_cub_tail, super_cub_fuselage, Units.INCHES)
+    super_cub = Aircraft("Super Cub", super_cub_wing, super_cub_tail, super_cub_fuselage, Units.METERS)
 
     # Enable debugging on aircraft
     super_cub.set_log_level(1)

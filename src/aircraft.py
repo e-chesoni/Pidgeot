@@ -132,18 +132,17 @@ class Aircraft:
             CL_wing = self._wing.find_CL_NACA(critical_alpha_rad) - decrease_factor
         '''
 
-        #CD_wing = self._wing.find_CD_NACA()
         CD_wing = self._wing.find_CD(CL_wing)
         CM_wing = self._wing.find_CM(h)
 
         # TAIL
         # NOTE: OK to use CL wing and AR to calculate epsion
+        # TODO: Look for in to m errors here
         self._tail.set_epsilon(self._tail.find_epsilon(CL_wing, self._tail.get_NACA().get_e(), self._wing.get_NACA().get_AR()))
         CL_tail = self._tail.find_CL(deg_to_rad(alpha_deg), deg_to_rad(del_e_deg), self._i_h)
-        #CD_tail = self._tail.find_CD_NACA()
         CD_tail = self._tail.find_CD(CL_tail)
         CM_tail = self._tail.find_CM(self._tail_surface_area_m, self._wing_surface_area_m, self._wing_chord_m, CL_tail)
-
+        
         # FUSELAGE
         CD_fuselage = self._fuselage.find_CD(Re_c, self._wing_chord_m)
         # NOTE: adjust super_cub_fuselage volume by * 1/3 for taper
@@ -319,7 +318,7 @@ class Aircraft:
 
     def find_trimmed_CL(self, V, weight, rho):
         g = 9.81
-        return (2 * weight * g) / (rho * V**2 * self._wing_surface_area_m)
+        return (2 * weight * g) / (rho * V**2 * self._wing_surface_area_m) # TODO: why does changing this form in to m not change cd0/k?
 
     def find_trimmed_drag(self, CL):
         return self._Cd0 + self._K * CL**2
