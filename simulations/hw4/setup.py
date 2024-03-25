@@ -9,16 +9,12 @@ from util.helpers import *
 from src.aircraft import *
 
 NACA_file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'NACA.json'))
-
-# Load the JSON file
-with open(NACA_file_path, 'r') as file:
-    naca_data = json.load(file)
-
-# Load the JSON file
 aircraft_file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'aircrafts.json'))
 
-with open(aircraft_file_path, 'r') as file:
-    aircraft_data = json.load(file)
+# Load both JSON files
+with open(NACA_file_path, 'r') as naca_file, open(aircraft_file_path, 'r') as aircraft_file:
+    naca_data = json.load(naca_file)
+    aircraft_data = json.load(aircraft_file)
 
 # Extract parameters for Super Cub
 super_cub_weight_kg = aircraft_data["super_cub"]["weight_kg"]

@@ -11,6 +11,27 @@ from src.aircraft import *
 # TODO: Remove Later
 hw_round = 6
 
+NACA_file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'NACA.json'))
+aircraft_file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'aircrafts.json'))
+
+# Load both JSON files
+with open(NACA_file_path, 'r') as naca_file, open(aircraft_file_path, 'r') as aircraft_file:
+    naca_data = json.load(naca_file)
+    aircraft_data = json.load(aircraft_file)
+
+# Extract wing parameters
+wing_span_m = aircraft_data["highway_pursuit"]["wing"]["span_m"]
+wing_chord_m = aircraft_data["highway_pursuit"]["wing"]["chord_m"]
+wing_center_of_gravity = aircraft_data["highway_pursuit"]["wing"]["center_of_gravity"]
+wing_surface_area_m = wing_span_m * wing_chord_m
+
+# Extract tail parameters
+tail_span_m = aircraft_data["highway_pursuit"]["tail"]["span_m"]
+tail_chord_m = aircraft_data["highway_pursuit"]["tail"]["chord_m"]
+elevator_chord_m = aircraft_data["highway_pursuit"]["tail"]["elevator_chord_m"]
+tail_thickness_m = aircraft_data["highway_pursuit"]["tail"]["thickness_m"]
+tail_surface_area_m = tail_span_m * tail_chord_m
+
 # Test Measurements
 # NOTE: Define test measurements in a dictionary
 test_measurements = {
@@ -25,26 +46,6 @@ test_measurements = {
     "Test Velocity Range (m/s)": np.linspace(0, 30, 100),
     "Test Air Density (kg/m^3)": 1.225,
 }
-
-json_file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'NACA.json'))
-
-# Load the JSON file
-with open(json_file_path, 'r') as file:
-    naca_data = json.load(file)
-
-# Wing Parameters
-wing_span_m = 0.943
-wing_chord_m = 0.324
-wing_center_of_gravity = 0.4 # percent distance from wing tip
-# NOTE: Simplified surface area is the product of the span and the chord
-wing_surface_area_m = wing_span_m * wing_chord_m
-
-# Tail Parameters
-tail_span_m = 0.4064
-tail_chord_m = 0.127
-elevator_chord_m = 0.051
-tail_thickness_m = 0.00635
-tail_surface_area_m = tail_span_m * tail_chord_m
 
 # Fuselage parameters
 fuselage_length_m = (1/3) * wing_span_m # NOTE: Same as super cub (eyeballed)
@@ -71,4 +72,3 @@ CL_max = CD_trimmed / K_trimmed
 CL_test = 0.2
 
 V_m_per_s = 45 # NOTE: Requirement is 100mph ~ 44.7 m/s
-#rho_sea_level = 1.225
