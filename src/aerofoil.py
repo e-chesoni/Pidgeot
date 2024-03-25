@@ -1,5 +1,8 @@
 import math
 
+from util.helpers import *
+from src.NACA import *
+
 class Aerofoil:
     def __init__(self) -> None:
         self._NACA = None
@@ -20,6 +23,29 @@ class Aerofoil:
     
     def set_NACA(self, NACA):
         self._NACA = NACA
+    
+    def set_NACA_from_data(self, naca_value, naca_data):
+
+        naca_params = naca_data[f"NACA_{naca_value}"]
+
+        
+        Cd = naca_params["Cd"]
+        Cd0 = naca_params["Cd0"]
+        CL = naca_params["CL"]
+        alpha_0_deg = naca_params["alpha_0_deg"]
+        CL_start = naca_params["CL_start"]
+        CL_end = naca_params["CL_end"]
+        alpha_start_deg = naca_params["alpha_start_deg"]
+        alpha_end_deg = naca_params["alpha_end_deg"]
+        e = naca_params["e"]
+
+        
+        naca = NACA(naca_value, Cd, CL, Cd0, deg_to_rad(alpha_0_deg), self.get_AR(), e)
+        naca.set_CL_window(CL_start, CL_end)
+        naca.set_alpha_window(alpha_start_deg, alpha_end_deg)
+        naca.set_CM_aero_center(naca_params["CMac"])
+        
+        self.set_NACA(naca)
 
     # Getters
     def get_span(self):

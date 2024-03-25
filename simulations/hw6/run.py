@@ -13,29 +13,71 @@ from src.wing import *
 from src.tail import *
 from src.fuselage import *
 
+# Set DEBUG option
 DEBUG = True
 
-highway_pursuit_wing = Wing()
-highway_pursuit_tail = Tail()
-highway_pursuit_fuselage = Fuselage()
-highway_pursuit = Aircraft("Highway Pursuit", highway_pursuit_wing, highway_pursuit_tail, highway_pursuit_fuselage)
+# TODO: Move this to aircraft?
+# Function to set wing paramerters
 
+
+# Test Values
+alpha_deg_test_value = test_measurements["Test Alpha (degrees)"]
+alpha_range_deg_test_value = test_measurements["Test Alpha Range (degrees)"]
+delta_e_deg_test_value = test_measurements["Test Delta_e (degrees)"]
+delta_e_list_deg_test_value = test_measurements["Test Delta_e List (degrees)"]
+Reynolds_test_value = test_measurements["Test Reynolds Number"]
+i_h_in_test_value = test_measurements["Test i_h (inches)"]
+h_test_value = test_measurements["Test h"]
+critical_angle_of_attack_test_value = test_measurements["Test Critical Angle of Attack (degrees)"]
+velocity_range_ms_test_value = test_measurements["Test Velocity Range (m/s)"]
+rho_test_value = test_measurements["Test Air Density (kg/m^3)"]
+
+# WING
+highway_pursuit_wing = Wing()
+highway_pursuit_wing.set_span(wing_span_m)
+highway_pursuit_wing.set_chord(wing_chord_m)
+highway_pursuit_wing.set_center_of_gravity(wing_center_of_gravity)
+
+# NACA WING parameters
+highway_pursuit_wing.set_NACA_from_data("4415", naca_data)
+
+# TAIL
+highway_pursuit_tail = Tail()
+highway_pursuit_tail.set_span(tail_span_m)
+highway_pursuit_tail.set_chord(tail_chord_m)
+
+# NACA TAIL parameters
+highway_pursuit_tail.set_NACA_from_data("0009", naca_data)
+
+# Additional tail parameters
+highway_pursuit_tail.set_tau(tau)
+highway_pursuit_tail.set_moment_arm_length(in_to_meters(wing_to_tail_dist_m))
+
+highway_pursuit_fuselage = Fuselage()
+highway_pursuit_fuselage.set_length(in_to_meters(fuselage_length_m))
+highway_pursuit_fuselage.set_height(in_to_meters(fuselage_height_m))
+
+highway_pursuit = Aircraft("Highway Pursuit", highway_pursuit_wing, highway_pursuit_tail, highway_pursuit_fuselage, Units.METERS)
+
+# Weight Calcuations
 highway_pursuit.set_W0(total_weight_kg)
 highway_pursuit.set_We_over_W0(We_over_W0)
 highway_pursuit.set_Wf_over_W0(highway_pursuit.find_Wf_over_W0(Range_km, H_F_km, L_over_D_cruise, eta_p))
 highway_pursuit.set_Wp(highway_pursuit.find_Wp())
 
 highway_pursuit.set_trimmed_drag_polar_coefficients(CD_trimmed, K_trimmed)
-highway_pursuit.set_wing_surface_area_m(highway_pursuit.find_wing_surface_area(rho_sea_level, V_m_per_s, CL_test)) # TODO: try flying at a lower CL
+highway_pursuit.set_wing_surface_area_m(highway_pursuit.find_wing_surface_area(rho_test_value, V_m_per_s, CL_test)) # TODO: try flying at a lower CL
 hp_wing_length, hp_wing_width = highway_pursuit.calculate_wing_dimensions_m()
 
 def run_hw6_simulation():
-    logging.info(f"Running HW{hw_round} Simulation...\n")
-
     if DEBUG:
+        logging.info(f"Running HW{hw_round} Simulation...\n")
+
+        print_info_table(test_measurements, "TEST MEASUREMENTS INFORMATION")
+
         hp_info = {
-            "Total Weight W0": highway_pursuit.get_W0(),
-            "Payload Weight": highway_pursuit.get_Wp(),
+            "Total Weight (kg)": highway_pursuit.get_W0(),
+            "Payload Weight (kg)": highway_pursuit.get_Wp(),
             "Wing Surface Area (meters)": highway_pursuit.get_wing_surface_area_m(),
             "Potential Wing Length (meters)": hp_wing_length,
             "Potential Wing Width (meters)": hp_wing_width,

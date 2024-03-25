@@ -7,7 +7,7 @@ from scipy.optimize import curve_fit
 from util.uav_logger import *
 from util.helpers import *
 from src.aircraft import *
-from src.setup import *
+from src.main_setup import *
 
 from simulations.hw4.run import *
 from simulations.hw5.run import *

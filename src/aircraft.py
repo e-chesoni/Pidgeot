@@ -2,6 +2,7 @@ from src.wing import *
 from src.tail import *
 from src.fuselage import *
 from util.uav_logger import *
+from src.main_setup import *
 
 from collections import namedtuple
 from typing import Union
@@ -22,9 +23,10 @@ red = '#ae2012'
 dark_red = '#9b2226'
 
 class Aircraft:
-    def __init__(self, name, wing, tail, fuselage):
+    def __init__(self, name, wing, tail, fuselage, units):
         logging.info(f"Aircraft named \"{name}\" created")
         self._name = name
+        self._units = units
         self._wing = wing
         self._tail = tail
         self._fuselage = fuselage
@@ -47,20 +49,32 @@ class Aircraft:
         return self._wing_surface_area_m
     
     # Setters
+    def set_units(self, units):
+        self._units = units
+
     def set_i_h(self, i_h):
         self._i_h = i_h
 
     def set_wing_surface_area_in(self, wing_surface_area_in):
         self._wing_surface_area_in = wing_surface_area_in
+        self._wing_surface_area_m = in_to_meters(wing_surface_area_in)
     
     def set_wing_surface_area_m(self, wing_surface_area_m):
         self._wing_surface_area_m = wing_surface_area_m
     
     def set_tail_surface_area_in(self, tail_surface_area_in):
         self._tail_surface_area_in = tail_surface_area_in
+        self._tail_surface_area_m = in_to_meters(tail_surface_area_in)
+    
+    def set_tail_surface_area_m(self, tail_surface_area_m):
+        self._tail_surface_area_m = tail_surface_area_m
     
     def set_wing_chord_in(self, wing_chord_in):
         self._wing_chord_in = wing_chord_in
+        self._wing_chord_m = in_to_meters(wing_chord_in)
+
+    def set_wing_chord_m(self, wing_chord_m):
+        self._wing_chord_m = wing_chord_m
 
     def set_weight(self, weight):
         self._weight = weight
@@ -88,8 +102,10 @@ class Aircraft:
         self._W0 = W0
 
     # Simulation Methods
+    
     def simulate(self, alpha_deg, del_e_deg, Re_c, h):
-        required_attributes = ['_wing', '_tail', '_fuselage', '_i_h', '_tail_surface_area_in', '_wing_surface_area_in', '_wing_chord_in']
+        
+        required_attributes = ['_wing', '_tail', '_fuselage', '_i_h', '_tail_surface_area_m', '_wing_surface_area_m', '_wing_chord_m']
         for attr in required_attributes:
             if getattr(self, attr, None) is None:
                 logging.error(f"Error: {attr} is not defined.\n")
@@ -121,13 +137,13 @@ class Aircraft:
         CL_tail = self._tail.find_CL(deg_to_rad(alpha_deg), deg_to_rad(del_e_deg), self._i_h)
         #CD_tail = self._tail.find_CD_NACA()
         CD_tail = self._tail.find_CD(CL_tail)
-        CM_tail = self._tail.find_CM(in_to_meters(self._tail_surface_area_in), in_to_meters(self._wing_surface_area_in), in_to_meters(self._wing_chord_in), CL_tail)
+        CM_tail = self._tail.find_CM(self._tail_surface_area_m, self._wing_surface_area_m, self._wing_chord_m, CL_tail)
 
         # FUSELAGE
-        CD_fuselage = self._fuselage.find_CD(Re_c, in_to_meters(self._wing_chord_in))
+        CD_fuselage = self._fuselage.find_CD(Re_c, self._wing_chord_m)
         # NOTE: adjust super_cub_fuselage volume by * 1/3 for taper
         volume_taper_percent = (1/3)
-        CM_fuselage = self._fuselage.find_CM(deg_to_rad(alpha_deg), in_to_meters(self._wing_surface_area_in), in_to_meters(self._wing_chord_in), volume_taper_percent)
+        CM_fuselage = self._fuselage.find_CM(deg_to_rad(alpha_deg), self._wing_surface_area_m, self._wing_chord_m, volume_taper_percent)
 
         CL = CL_wing + CL_tail
         CD = CD_wing + CD_tail + CD_fuselage
@@ -298,7 +314,7 @@ class Aircraft:
 
     def find_trimmed_CL(self, V, weight, rho):
         g = 9.81
-        return (2 * weight * g) / (rho * V**2 * self._wing_surface_area_in)
+        return (2 * weight * g) / (rho * V**2 * self._wing_surface_area_m)
 
     def find_trimmed_drag(self, CL):
         return self._Cd0 + self._K * CL**2
@@ -306,7 +322,7 @@ class Aircraft:
     def find_thrust_power(self, V, rho):
         trimmed_CL = self.find_trimmed_CL(self._weight, rho, V)
         trimmed_CD = self.find_trimmed_drag(trimmed_CL)
-        D = 0.5 * rho * V**2 * self._wing_surface_area_in * trimmed_CD  # Drag = Thurst
+        D = 0.5 * rho * V**2 * self._wing_surface_area_m * trimmed_CD  # Drag = Thurst
         P = D * V  # Power
         return D, P
     
