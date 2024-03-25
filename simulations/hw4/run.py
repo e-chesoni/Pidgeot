@@ -19,7 +19,7 @@ alpha_range_deg_test_value = test_measurements["Test Alpha Range (degrees)"]
 delta_e_deg_test_value = test_measurements["Test Delta_e (degrees)"]
 delta_e_list_deg_test_value = test_measurements["Test Delta_e List (degrees)"]
 Reynolds_test_value = test_measurements["Test Reynolds Number"]
-i_h_test_value = test_measurements["Test i_h"]
+i_h_m_test_value = test_measurements["Test i_h (meters)"]
 h_test_value = test_measurements["Test h"]
 critical_angle_of_attack_test_value = test_measurements["Test Critical Angle of Attack (degrees)"]
 velocity_range_ms_test_value = test_measurements["Test Velocity Range (m/s)"]
@@ -39,6 +39,8 @@ super_cub_wing.set_NACA_from_data("2415", naca_data)
 super_cub_tail = Tail()
 super_cub_tail.set_span(in_to_meters(tail_span_in))
 super_cub_tail.set_chord(in_to_meters(tail_chord_in))
+
+super_cub_wing.set_NACA_from_data("0009", naca_data)
 NACA_0009 = NACA("0009", Cd_0009, CL_0009, Cd0_0009, deg_to_rad(alpha_0_0009_deg), super_cub_tail.get_AR(), e_tail)
 NACA_0009.set_CL_window(CL_0009_start, CL_0009_end)
 NACA_0009.set_alpha_window(alpha_0009_start_deg, alpha_0009_end_deg) # NOTE: OK to use degrees here; converted to rad in a_2D calc
@@ -64,7 +66,7 @@ def run_hw4_simulation():
     super_cub.set_log_level(1)
 
     # Set variables on aircraft for testing
-    super_cub.set_i_h(i_h_test_value)
+    super_cub.set_i_h(i_h_m_test_value)
     super_cub.set_wing_surface_area_in(wing_surface_area_in) # NOTE: also convers in to m and sets wing_surface_area_m on aircraft
     super_cub.set_tail_surface_area_in(tail_surface_area_in) # NOTE: also convers in to m and sets wing_surface_area_m on aircraft
     super_cub.set_wing_chord_in(wing_chord_in) # NOTE: also convers in to m and sets wing_surface_area_m on aircraft
@@ -76,7 +78,6 @@ def run_hw4_simulation():
     # Call plotting function
     cl_max_list = super_cub.plot_aero_curves(alpha_range_deg_test_value, delta_e_list_deg_test_value, Reynolds_test_value, h_test_value)
     logging.info(f"CL_max: {cl_max_list[0]}")
-    #TODO: add max values to plot, remove redundant log below
 
     # PROBLEM 2
     # Find trimmed elevator angle for a range of angles of attack

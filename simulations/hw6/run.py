@@ -26,7 +26,7 @@ alpha_range_deg_test_value = test_measurements["Test Alpha Range (degrees)"]
 delta_e_deg_test_value = test_measurements["Test Delta_e (degrees)"]
 delta_e_list_deg_test_value = test_measurements["Test Delta_e List (degrees)"]
 Reynolds_test_value = test_measurements["Test Reynolds Number"]
-i_h_in_test_value = test_measurements["Test i_h (inches)"]
+i_h_m_test_value = test_measurements["Test i_h (meters)"]
 h_test_value = test_measurements["Test h"]
 critical_angle_of_attack_test_value = test_measurements["Test Critical Angle of Attack (degrees)"]
 velocity_range_ms_test_value = test_measurements["Test Velocity Range (m/s)"]
@@ -59,6 +59,27 @@ highway_pursuit_fuselage.set_height(in_to_meters(fuselage_height_m))
 
 highway_pursuit = Aircraft("Highway Pursuit", highway_pursuit_wing, highway_pursuit_tail, highway_pursuit_fuselage, Units.METERS)
 
+# Enable debugging on aircraft
+highway_pursuit.set_log_level(1)
+
+# Set variables on aircraft for testing
+highway_pursuit.set_i_h(i_h_m_test_value)
+highway_pursuit.set_wing_surface_area_m(wing_surface_area_m) # NOTE: also convers in to m and sets wing_surface_area_m on aircraft
+highway_pursuit.set_tail_surface_area_m(tail_surface_area_m) # NOTE: also convers in to m and sets wing_surface_area_m on aircraft
+highway_pursuit.set_wing_chord_m(wing_chord_m) # NOTE: also convers in to m and sets wing_surface_area_m on aircraft
+highway_pursuit.set_critical_angle_of_attack(critical_angle_of_attack_test_value)
+
+# Run simulation
+highway_pursuit.simulate(alpha_deg_test_value, delta_e_deg_test_value, Reynolds_test_value, h_test_value)
+
+# Call plotting function
+cl_max_list = highway_pursuit.plot_aero_curves(alpha_range_deg_test_value, delta_e_list_deg_test_value, Reynolds_test_value, h_test_value)
+
+# Find Cd0 and K
+highway_pursuit.set_log_level(3)
+
+Cd0, K = highway_pursuit.find_trimmed_drag_polar_coefficients(alpha_range_deg_test_value, Reynolds_test_value, h_test_value)
+
 # Weight Calcuations
 highway_pursuit.set_W0(total_weight_kg)
 highway_pursuit.set_We_over_W0(We_over_W0)
@@ -83,3 +104,8 @@ def run_hw6_simulation():
             "Potential Wing Width (meters)": hp_wing_width,
         }
         print_info_table(hp_info, "HIGHWAY PURSUIT UAV INFORMATION")
+
+        logging.info(f"CL_max: {cl_max_list[0]}")
+        logging.info(f"Cd0: {Cd0}, K: {K}")
+
+

@@ -117,6 +117,10 @@ class Aircraft:
         alpha_rad = deg_to_rad(alpha_deg)
         critical_alpha_rad = deg_to_rad(self._critical_angle_of_attack)
         
+        CL_wing = self._wing.find_CL_NACA(alpha_rad)
+
+        # TODO: Still working on this...
+        '''    
         # Adjust CL calculation for stall behavior
         if alpha_rad <= critical_alpha_rad:
             CL_wing = self._wing.find_CL_NACA(alpha_rad)
@@ -126,6 +130,7 @@ class Aircraft:
             #decrease_factor = 5 * (alpha_rad - critical_alpha_rad)
             decrease_factor = 0
             CL_wing = self._wing.find_CL_NACA(critical_alpha_rad) - decrease_factor
+        '''
 
         #CD_wing = self._wing.find_CD_NACA()
         CD_wing = self._wing.find_CD(CL_wing)

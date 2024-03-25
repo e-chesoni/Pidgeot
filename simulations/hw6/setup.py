@@ -20,7 +20,7 @@ test_measurements = {
     "Test Delta_e List (degrees)": [0, 5, 10],
     "Test Reynolds Number": 6e5,
     "Test h": 0.25,
-    "Test i_h (inches)": 0,
+    "Test i_h (meters)": 0,
     "Test Critical Angle of Attack (degrees)": 12,
     "Test Velocity Range (m/s)": np.linspace(0, 30, 100),
     "Test Air Density (kg/m^3)": 1.225,
@@ -37,18 +37,14 @@ wing_span_m = 0.943
 wing_chord_m = 0.324
 wing_center_of_gravity = 0.4 # percent distance from wing tip
 # NOTE: Simplified surface area is the product of the span and the chord
-wing_surface_area_in = wing_span_m * wing_chord_m
-
-# NACA 4415 Parameters (for Wing)
-h_cg_wing = 0.4 # cg of the wing
-eta_tail_super = 0.5
+wing_surface_area_m = wing_span_m * wing_chord_m
 
 # Tail Parameters
 tail_span_m = 0.4064
 tail_chord_m = 0.127
 elevator_chord_m = 0.051
 tail_thickness_m = 0.00635
-tail_surface_area_in = tail_span_m * tail_chord_m
+tail_surface_area_m = tail_span_m * tail_chord_m
 
 # Fuselage parameters
 fuselage_length_m = (1/3) * wing_span_m # NOTE: Same as super cub (eyeballed)

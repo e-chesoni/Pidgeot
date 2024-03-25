@@ -1,0 +1,38 @@
+{
+    "super_cub": {
+      "weight_kg": 750,
+      "wing": {
+        "span_in": 47,
+        "chord_in": 7.5,
+        "center_of_gravity": 0.4,
+        "surface_area_in": 352.5
+      },
+      "tail": {
+        "span_in": 16,
+        "chord_in": 5,
+        "elevator_chord_in": 2,
+        "thickness_in": 0.25,
+        "surface_area_in": 80
+      },
+      "fuselage": {
+        "length_m": 0.3143,
+        "height_m": 0.375
+      }
+    },
+    "highway_pursuit": {
+      "wing": {
+        "span_m": 0.943,
+        "chord_m": 0.324,
+        "center_of_gravity": 0.4,
+        "surface_area_m": 0.305112
+      },
+      "tail": {
+        "span_m": 0.4064,
+        "chord_m": 0.127,
+        "elevator_chord_m": 0.051,
+        "thickness_m": 0.00635,
+        "surface_area_m": 0.051596
+      }
+    }
+  }
+  

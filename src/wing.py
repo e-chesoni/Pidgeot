@@ -20,4 +20,7 @@ class Wing(Aerofoil):
         return self._NACA.find_CL(alpha)
 
     def find_CM(self, h): 
+        # TODO: FIX ME: self._NACA._CM_aero_center is a string?
+        print(type(self._NACA._CM_aero_center)) # string
+        print(type(self._NACA._CL))
         return self._NACA._CM_aero_center + ((h - self._h_cg) * self._NACA._CL)
