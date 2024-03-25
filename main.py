@@ -23,6 +23,6 @@ logging.info('Logging enabled')
 logging.info(f"Log level: {logging.getLogger().getEffectiveLevel()}")
 print("\n")
 
-run_hw4_simulation()
+#run_hw4_simulation()
 #run_hw5_simulation()
-#run_hw6_simulation()
+run_hw6_simulation()
