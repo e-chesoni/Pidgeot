@@ -12,13 +12,13 @@ class Aerofoil:
         self._h_cg = None  # Center of gravity might be more specific to wings, consider if it should be here
 
     # Setters
-    def set_span(self, n):
+    def set_span_m(self, n):
         self._span = n
     
-    def set_chord(self, n):
+    def set_chord_m(self, n):
         self._chord = n
     
-    def set_thickness(self, n):
+    def set_thicknes_m(self, n):
         self._thickness = n
     
     def set_NACA(self, NACA):
@@ -28,7 +28,6 @@ class Aerofoil:
 
         naca_params = naca_data[f"NACA_{naca_value}"]
 
-        
         Cd = naca_params["Cd"]
         Cd0 = naca_params["Cd0"]
         CL = naca_params["CL"]
@@ -48,13 +47,13 @@ class Aerofoil:
         self.set_NACA(naca)
 
     # Getters
-    def get_span(self):
+    def get_span_m(self):
         return self._span
     
-    def get_chord(self):
+    def get_chord_m(self):
         return self._chord
     
-    def get_thickness(self):
+    def get_thickness_m(self):
         return self._thickness
     
     def get_AR(self):

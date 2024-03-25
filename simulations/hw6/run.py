@@ -34,8 +34,8 @@ rho_test_value = test_measurements["Test Air Density (kg/m^3)"]
 
 # WING
 highway_pursuit_wing = Wing()
-highway_pursuit_wing.set_span(wing_span_m)
-highway_pursuit_wing.set_chord(wing_chord_m)
+highway_pursuit_wing.set_span_m(wing_span_m)
+highway_pursuit_wing.set_chord_m(wing_chord_m)
 highway_pursuit_wing.set_center_of_gravity(wing_center_of_gravity)
 
 # NACA WING parameters
@@ -43,8 +43,8 @@ highway_pursuit_wing.set_NACA_from_data("4415", naca_data)
 
 # TAIL
 highway_pursuit_tail = Tail()
-highway_pursuit_tail.set_span(tail_span_m)
-highway_pursuit_tail.set_chord(tail_chord_m)
+highway_pursuit_tail.set_span_m(tail_span_m)
+highway_pursuit_tail.set_chord_m(tail_chord_m)
 
 # NACA TAIL parameters
 highway_pursuit_tail.set_NACA_from_data("0009", naca_data)
@@ -57,7 +57,9 @@ highway_pursuit_fuselage = Fuselage()
 highway_pursuit_fuselage.set_length(in_to_meters(fuselage_length_m))
 highway_pursuit_fuselage.set_height(in_to_meters(fuselage_height_m))
 
-highway_pursuit = Aircraft("Highway Pursuit", highway_pursuit_wing, highway_pursuit_tail, highway_pursuit_fuselage, Units.METERS)
+# TODO: Change back ater fixing hw4
+#highway_pursuit = Aircraft("Highway Pursuit", highway_pursuit_wing, highway_pursuit_tail, highway_pursuit_fuselage, Units.METERS)
+highway_pursuit = Aircraft("Highway Pursuit", highway_pursuit_wing, highway_pursuit_tail, highway_pursuit_fuselage)
 
 '''
 # Enable debugging on aircraft

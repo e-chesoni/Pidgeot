@@ -29,3 +29,13 @@ run_hw4_simulation()
 
 # TODO: Find out why hw4 cd and k are now off...probs has to do with switch from in to m in calcuations in aircraft
 # TODO: Add NACA_4415_flap data to NACA.json and analyze
+
+# Original Cd0 and K
+'''
+With stall model:
+Cd0: 0.020371971358155425, K: 0.07113300617850266
+
+Without stall model:
+Cd0: 0.018031029469694596, K: 0.07573324822233674
+
+'''

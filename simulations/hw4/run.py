@@ -28,16 +28,16 @@ rho_test_value = test_measurements["Test Air Density (kg/m^3)"]
 # PROBLEM 1
 # WING
 super_cub_wing = Wing()
-super_cub_wing.set_span(in_to_meters(wing_span_in))
-super_cub_wing.set_chord(in_to_meters(wing_chord_in))
+super_cub_wing.set_span_m(in_to_meters(wing_span_in))
+super_cub_wing.set_chord_m(in_to_meters(wing_chord_in))
 super_cub_wing.set_center_of_gravity(wing_center_of_gravity)
 # NACA WING parameters
 super_cub_wing.set_NACA_from_data("2415", naca_data)
 
 # TAIL
 super_cub_tail = Tail()
-super_cub_tail.set_span(in_to_meters(tail_span_in))
-super_cub_tail.set_chord(in_to_meters(tail_chord_in))
+super_cub_tail.set_span_m(in_to_meters(tail_span_in))
+super_cub_tail.set_chord_m(in_to_meters(tail_chord_in))
 # NACA TAIL parameters
 super_cub_tail.set_NACA_from_data("0009", naca_data)
 
@@ -55,7 +55,7 @@ def run_hw4_simulation():
         print_info_table(test_measurements, "TEST MEASUREMENTS INFORMATION")
 
     # AIRCRAFT
-    super_cub = Aircraft("Super Cub", super_cub_wing, super_cub_tail, super_cub_fuselage, Units.METERS)
+    super_cub = Aircraft("Super Cub", super_cub_wing, super_cub_tail, super_cub_fuselage)
 
     # Enable debugging on aircraft
     super_cub.set_log_level(1)
@@ -84,7 +84,7 @@ def run_hw4_simulation():
 
     # PROBLEM 3
     super_cub.set_trimmed_drag_polar_coefficients(Cd0, K)
-    super_cub.set_weight(kg_to_g(super_cub_weight_kg))
+    super_cub.set_weight(super_cub_weight_kg)
     super_cub.plot_thrust_and_power(rho_test_value, velocity_range_ms_test_value)
     logging.info(f"CL_max: {cl_max_list[0]}")
 

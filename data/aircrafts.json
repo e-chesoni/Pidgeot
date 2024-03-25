@@ -1,6 +1,7 @@
 {
     "super_cub": {
-      "weight_kg": 750,
+      "weight_kg": 0.75,
+      "weight_g": 750,
       "wing": {
         "span_in": 47,
         "chord_in": 7.5,

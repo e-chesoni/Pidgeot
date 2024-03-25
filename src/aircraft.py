@@ -23,10 +23,9 @@ red = '#ae2012'
 dark_red = '#9b2226'
 
 class Aircraft:
-    def __init__(self, name, wing, tail, fuselage, units):
+    def __init__(self, name, wing, tail, fuselage):
         logging.info(f"Aircraft named \"{name}\" created")
         self._name = name
-        self._units = units
         self._wing = wing
         self._tail = tail
         self._fuselage = fuselage
@@ -102,9 +101,7 @@ class Aircraft:
         self._W0 = W0
 
     # Simulation Methods
-    
     def simulate(self, alpha_deg, del_e_deg, Re_c, h):
-        
         required_attributes = ['_wing', '_tail', '_fuselage', '_i_h', '_tail_surface_area_m', '_wing_surface_area_m', '_wing_chord_m']
         for attr in required_attributes:
             if getattr(self, attr, None) is None:
@@ -117,10 +114,7 @@ class Aircraft:
         alpha_rad = deg_to_rad(alpha_deg)
         critical_alpha_rad = deg_to_rad(self._critical_angle_of_attack)
         
-        CL_wing = self._wing.find_CL_NACA(alpha_rad)
-
-        # TODO: Still working on this...
-        '''    
+        # NOTE: Testing stall model for drag polar
         # Adjust CL calculation for stall behavior
         if alpha_rad <= critical_alpha_rad:
             CL_wing = self._wing.find_CL_NACA(alpha_rad)
@@ -130,19 +124,17 @@ class Aircraft:
             #decrease_factor = 5 * (alpha_rad - critical_alpha_rad)
             decrease_factor = 0
             CL_wing = self._wing.find_CL_NACA(critical_alpha_rad) - decrease_factor
-        '''
 
         CD_wing = self._wing.find_CD(CL_wing)
         CM_wing = self._wing.find_CM(h)
 
         # TAIL
         # NOTE: OK to use CL wing and AR to calculate epsion
-        # TODO: Look for in to m errors here
         self._tail.set_epsilon(self._tail.find_epsilon(CL_wing, self._tail.get_NACA().get_e(), self._wing.get_NACA().get_AR()))
         CL_tail = self._tail.find_CL(deg_to_rad(alpha_deg), deg_to_rad(del_e_deg), self._i_h)
         CD_tail = self._tail.find_CD(CL_tail)
         CM_tail = self._tail.find_CM(self._tail_surface_area_m, self._wing_surface_area_m, self._wing_chord_m, CL_tail)
-        
+
         # FUSELAGE
         CD_fuselage = self._fuselage.find_CD(Re_c, self._wing_chord_m)
         # NOTE: adjust super_cub_fuselage volume by * 1/3 for taper
@@ -155,8 +147,8 @@ class Aircraft:
 
         if self._log_level == 1:
             wing_info = {
-                "Wing Span": self._wing.get_span(),
-                "Wing Chord": self._wing.get_chord(),
+                "Wing Span": self._wing.get_span_m(),
+                "Wing Chord": self._wing.get_chord_m(),
                 "Wing Center of Gravity": self._wing.get_center_of_gravity(),
                 "CL Wing": CL_wing,
                 "CD Wing": CD_wing,
@@ -165,8 +157,8 @@ class Aircraft:
             NACA_2415_info = self._wing.get_NACA().export_variables_to_dict()
 
             tail_info = {
-                "Tail Span": self._tail.get_span(),
-                "Tail Chord": self._tail.get_chord(),
+                "Tail Span": self._tail.get_span_m(),
+                "Tail Chord": self._tail.get_chord_m(),
                 "Tail Epsilon": self._tail.get_epsilon(),
                 "Tail Tau": self._tail.get_tau(),
                 "CL Tail": CL_tail,
@@ -254,7 +246,7 @@ class Aircraft:
                 # Highlight CL at the critical angle on the plot
                 ax1.plot(crit_angle, CL_at_crit_angle, 'x', color='red', label=f'CL at Crit Angle, del_e={del_e_deg}')
 
-            ax2.plot(alpha_range, CM_values, '--', label=f'CM vs Alpha, del_e={del_e_deg}', color=color2)
+                ax2.plot(alpha_range, CM_values, '--', label=f'CM vs Alpha, del_e={del_e_deg}', color=color2)
         
         ax1.set_xlabel('Alpha (degrees)')
         ax1.set_ylabel('CL (Lift Coefficient)', color=dark_blue)
@@ -318,7 +310,7 @@ class Aircraft:
 
     def find_trimmed_CL(self, V, weight, rho):
         g = 9.81
-        return (2 * weight * g) / (rho * V**2 * self._wing_surface_area_m) # TODO: why does changing this form in to m not change cd0/k?
+        return (2 * weight * g) / (rho * V**2 * self._wing_surface_area_m)
 
     def find_trimmed_drag(self, CL):
         return self._Cd0 + self._K * CL**2
