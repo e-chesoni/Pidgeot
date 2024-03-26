@@ -53,6 +53,7 @@ def run_hw4_simulation():
         print_info_table(test_measurements, "TEST MEASUREMENTS INFORMATION")
 
     # Run simulation to get CL max, Cd0, and K
+    uav_simulator_settings.set_plots(True) # Enable plots
     CL_max, Cd0, K = Simulate.run_aircraft_simulation(super_cub, test_measurements, wing_surface_area_m, tail_surface_area_m, wing_chord_m)
 
     # PROBLEM 3

@@ -1,4 +1,6 @@
 import logging
+from src.settings import *
+
 
 class Simulate():
     @staticmethod
@@ -24,15 +26,6 @@ class Simulate():
         logging.info(f"Total CD: {CD}")
         logging.info(f"Total CM: {CM}")
 
-        # Call plotting function
-        cl_max_list = aircraft.plot_aero_curves(test_measurements["Test Alpha Range (degrees)"],
-                                                test_measurements["Test Delta_e List (degrees)"],
-                                                test_measurements["Test Reynolds Number"], test_measurements["Test h"])
-
-        # NOTE: Arbitrary choice for cl max
-        CL_max = cl_max_list[0]
-
-        # PROBLEM 2
         # Find trimmed elevator angle for a range of angles of attack
         # NOTE: Print statements causes lambda function to fail; need to turn them off for P2
         aircraft.set_log_level(3)
@@ -41,8 +34,20 @@ class Simulate():
                                                             test_measurements["Test Reynolds Number"],
                                                             test_measurements["Test h"])
 
-        logging.info(f"Drag Polar CL_max: {cl_max_list[0]}")
+        if uav_simulator_settings.get_plot_setting():
+            # Call plotting function
+            cl_max_list = aircraft.plot_aero_curves(test_measurements["Test Alpha Range (degrees)"],
+                                                    test_measurements["Test Delta_e List (degrees)"],
+                                                    test_measurements["Test Reynolds Number"], test_measurements["Test h"])
+            # NOTE: Arbitrary choice for cl max
+            CL_max = cl_max_list[0]
+        
+        else:
+            CL_max = aircraft.find_cl_max(Cd0, K)
+
         logging.info(f"Cd0: {Cd0}, K: {K}")
+        logging.info(f"CL_max: {CL_max}")
+        print("\n")
 
         return CL_max, Cd0, K
 

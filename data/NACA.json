@@ -32,15 +32,29 @@
     "NACA_4415": {
       "Type": "4415",
       "CMac": 0.18,
-      "Cd": 0.02,
-      "Cd0": 0.012,
-      "CL": 0.9,
-      "alpha_0_deg": -1,
-      "CL_start": 0.3,
-      "CL_end": 0.7,
-      "alpha_start_deg": -1,
-      "alpha_end_deg": 5,
+      "Cd": 0.0075,
+      "Cd0": 0.0115,
+      "CL": 1,
+      "alpha_0_deg": -4,
+      "CL_start": 0.4,
+      "CL_end": 0.8,
+      "alpha_start_deg": 0,
+      "alpha_end_deg": 4,
       "e": 0.75
+    },
+
+    "NACA_4415_with_Flap": {
+      "Type": "4415_with_Flap",
+      "CMac": 0.18,
+      "Cd": 0.0155,
+      "Cd0": 0.015,
+      "CL": 0.9,
+      "alpha_0_deg": -16,
+      "CL_start": 0.4,
+      "CL_end": 0.8,
+      "alpha_start_deg": 0,
+      "alpha_end_deg": 4,
+      "e": 0.7
     }
   }
   

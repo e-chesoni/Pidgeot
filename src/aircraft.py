@@ -175,47 +175,7 @@ class Aircraft:
         CL = CL_wing + CL_tail
         CD = CD_wing + CD_tail + CD_fuselage
         CM = CM_wing + CM_tail + CM_fuselage
-        '''
-        if self._log_level == 1:
-            wing_info = {
-                "Wing Span": self._wing.get_span_m(),
-                "Wing Chord": self._wing.get_chord_m(),
-                "Wing Center of Gravity": self._wing.get_center_of_gravity(),
-                "CL Wing": CL_wing,
-                "CD Wing": CD_wing,
-                "CM Wing": CM_wing
-            }
-            NACA_wing_info = self._wing.get_NACA().export_variables_to_dict()
 
-            tail_info = {
-                "Tail Span": self._tail.get_span_m(),
-                "Tail Chord": self._tail.get_chord_m(),
-                "Tail Epsilon": self._tail.get_epsilon(),
-                "Tail Tau": self._tail.get_tau(),
-                "CL Tail": CL_tail,
-                "CD Tail": CD_tail,
-                "CM Tail": CM_tail,
-            }
-            NACA_tail_info = self._tail.get_NACA().export_variables_to_dict()
-
-            fuselage_info = {
-                "Fuselage Length": self._fuselage.get_length_m(),
-                "Fuselage Height": self._fuselage.get_height_m(),
-                "CD Fuselage": CD_fuselage,
-                "CM Fuselage": CM_fuselage,
-            }
-            
-            print_info_table(NACA_wing_info, f"NACA {self._wing.get_NACA()._wing_type} INFORMATION")
-            print_info_table(wing_info, "WING INFORMATION")
-            print_info_table(NACA_tail_info, "NACA 0009 INFORMATION")
-            print_info_table(tail_info, "TAIL INFORMATION")
-            print_info_table(fuselage_info, "FUSELAGE INFORMATION")
-        
-        elif self._log_level == 2:
-            logging.info(f"Total CL: {CL}")
-            logging.info(f"Total CD: {CD}")
-            logging.info(f"Total CM: {CM}")
-        '''
         # NOTE: PAY ATTENTION TO RETURN ORDER HERE!!
         return AeroCoefficients(CL=CL, CD=CD, CM=CM)
     
@@ -314,6 +274,37 @@ class Aircraft:
         plt.show()
 
         return cl_max_list
+
+    def find_drag_polar_cl_max_list(self, alpha_range, del_e_degs, Re_c, h):
+        """
+        Finds the maximum lift coefficient (CL) for a range of angle of attack values and elevator deflection angles.
+
+        Parameters:
+        - alpha_range (numpy.ndarray): An array of angle of attack values in degrees.
+        - del_e_degs (list of float): List of elevator deflection angles in degrees.
+        - Re_c (float): Reynolds number based on the chord length.
+        - h (float): Altitude.
+
+        Returns:
+        - cl_max_list (list): List containing the maximum lift coefficient (CL) for each elevator deflection angle.
+        """
+        cl_max_list = []
+
+        for del_e_deg in del_e_degs:
+            CL_values = []
+
+            for alpha_deg in alpha_range:
+                CL, _, _ = self.simulate(alpha_deg, del_e_deg, Re_c, h)
+                CL_values.append(CL)
+
+            # Find CL_max and corresponding alpha
+            CL_max = max(CL_values)
+            cl_max_list.append(CL_max)
+
+        return cl_max_list
+
+    def find_cl_max(self, Cd0, K):
+        return math.sqrt(Cd0/K)
 
     def find_trimmed_drag_polar_coefficients(self, alpha_range, Re_c, h):
         trimmed_data = []
