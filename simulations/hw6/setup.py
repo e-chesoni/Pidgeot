@@ -32,21 +32,6 @@ elevator_chord_m = aircraft_data["highway_pursuit"]["tail"]["elevator_chord_m"]
 tail_thickness_m = aircraft_data["highway_pursuit"]["tail"]["thickness_m"]
 tail_surface_area_m = tail_span_m * tail_chord_m
 
-# Test Measurements
-# NOTE: Define test measurements in a dictionary
-test_measurements = {
-    "Test Alpha (degrees)": 30, # NOTE: for main impl: alpha range -30 to 30 (-0.524 - 0.524 in rads) intervals of 5
-    "Test Alpha Range (degrees)": np.linspace(-10, 30, 21),
-    "Test Delta_e (degrees)": 20,
-    "Test Delta_e List (degrees)": [0, 5, 10],
-    "Test Reynolds Number": 6e5,
-    "Test h": 0.25,
-    "Test i_h (meters)": 0,
-    "Test Critical Angle of Attack (degrees)": 12,
-    "Test Velocity Range (m/s)": np.linspace(0, 30, 100),
-    "Test Air Density (kg/m^3)": 1.225,
-}
-
 # Fuselage parameters
 fuselage_length_m = (1/3) * wing_span_m # NOTE: Same as super cub (eyeballed)
 fuselage_height_m = (4/5) * wing_chord_m # NOTE: Same as super cub (eyeballed)

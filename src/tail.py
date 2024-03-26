@@ -7,7 +7,7 @@ class Tail(Aerofoil):
         pass
     
     # Setters
-    def set_tail_thickness(self, n):
+    def set_tail_thickness_m(self, n):
         self._tail_thickness = n
     
     def set_epsilon(self, epsilon):
@@ -16,7 +16,7 @@ class Tail(Aerofoil):
     def set_tau(self, tau):
         self._tau = tau
 
-    def set_moment_arm_length(self, moment_arm_tail):
+    def set_moment_arm_length_m(self, moment_arm_tail):
         self._moment_arm = moment_arm_tail
     
     # Getters

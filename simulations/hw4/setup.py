@@ -18,7 +18,6 @@ with open(NACA_file_path, 'r') as naca_file, open(aircraft_file_path, 'r') as ai
 
 # NOTE: Do not put conversions in setup
 # Super Cub Parameters
-#super_cub_weight_kg = aircraft_data["super_cub"]["weight_g"]
 super_cub_weight_kg = aircraft_data["super_cub"]["weight_kg"]
 
 # Wing parameters
@@ -33,36 +32,29 @@ wing_surface_area_m = in_to_meters(wing_surface_area_in)
 
 # Tail parameters
 tail_span_in = aircraft_data["super_cub"]["tail"]["span_in"]
+tail_span_m = in_to_meters(tail_span_in)
 tail_chord_in = aircraft_data["super_cub"]["tail"]["chord_in"]
+tail_chord_m = in_to_meters(tail_chord_in)
 elevator_chord_in = aircraft_data["super_cub"]["tail"]["elevator_chord_in"]
+elevator_chord_m = in_to_meters(elevator_chord_in)
 tail_thickness_in = aircraft_data["super_cub"]["tail"]["thickness_in"]
+tail_thickness_m = in_to_meters(tail_thickness_in)
 tail_surface_area_in = tail_span_in * tail_chord_in
+tail_surface_area_m = in_to_meters(tail_surface_area_in)
 
 # Fuselage parameters
 fuselage_length_in = (1/3) * wing_span_in # NOTE: Looks like ~1/3 wing span
+fuselage_length_m = in_to_meters(fuselage_length_in)
 fuselage_height_in = (4/5) * wing_chord_in # NOTE: Looks like ~4/5 wing chord
+fuselage_height_m = in_to_meters(fuselage_height_in)
 
 tau = 0.7
 
 # Combined Parameters
 wing_to_tail_dist_in = 18
+wing_to_tail_dist_m = in_to_meters(wing_to_tail_dist_in)
 
 # NACA 2415 Parameters (for Wing)
 CMac_wing_2415 = 0.18
 h_cg_wing = 0.4 # cg of the wing
 eta_tail_super = 0.5
-
-# Test Measurements
-# NOTE: Define test measurements in a dictionary
-test_measurements = {
-    "Test Alpha (degrees)": 30, # NOTE: for main impl: alpha range -30 to 30 (-0.524 - 0.524 in rads) intervals of 5
-    "Test Alpha Range (degrees)": np.linspace(-10, 30, 21),
-    "Test Delta_e (degrees)": 20,
-    "Test Delta_e List (degrees)": [0, 5, 10],
-    "Test Reynolds Number": 6e5,
-    "Test h": 0.25,
-    "Test i_h (meters)": 0,
-    "Test Critical Angle of Attack (degrees)": 12,
-    "Test Velocity Range (m/s)": np.linspace(0, 30, 100),
-    "Test Air Density (kg/m^3)": 1.225,
-}

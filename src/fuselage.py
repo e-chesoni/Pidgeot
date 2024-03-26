@@ -5,17 +5,17 @@ class Fuselage:
         pass
 
     # Setters
-    def set_length(self, l_meters):
+    def set_length_m(self, l_meters):
         self._length = l_meters
     
-    def set_height(self, h_meters):
+    def set_height_m(self, h_meters):
         self._height = h_meters
 
     # Getters
-    def get_length(self):
+    def get_length_m(self):
         return self._length
     
-    def get_height(self):
+    def get_height_m(self):
         return self._height
     
     def get_d_to_l_ratio(self):

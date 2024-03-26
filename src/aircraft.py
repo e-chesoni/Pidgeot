@@ -2,7 +2,7 @@ from src.wing import *
 from src.tail import *
 from src.fuselage import *
 from util.uav_logger import *
-from src.main_setup import *
+from src.setup import *
 
 from collections import namedtuple
 from typing import Union
@@ -99,6 +99,37 @@ class Aircraft:
     
     def set_W0(self, W0):
         self._W0 = W0
+        
+    # Print methods
+    def print_aircraft_info(self):
+        if self._log_level == 1:
+            wing_info = {
+                "Wing Span": self._wing.get_span_m(),
+                "Wing Chord": self._wing.get_chord_m(),
+                "Wing Center of Gravity": self._wing.get_center_of_gravity(),
+            }
+            NACA_wing_info = self._wing.get_NACA().export_variables_to_dict()
+
+            tail_info = {
+                "Tail Span": self._tail.get_span_m(),
+                "Tail Chord": self._tail.get_chord_m(),
+                "Tail Epsilon": self._tail.get_epsilon(),
+                "Tail Tau": self._tail.get_tau(),
+            }
+            NACA_tail_info = self._tail.get_NACA().export_variables_to_dict()
+
+            fuselage_info = {
+                "Fuselage Length": self._fuselage.get_length_m(),
+                "Fuselage Height": self._fuselage.get_height_m(),
+            }
+            
+            print_info_table(NACA_wing_info, f"NACA {self._wing.get_NACA()._wing_type} INFORMATION")
+            print_info_table(wing_info, "WING INFORMATION")
+            print_info_table(NACA_tail_info, "NACA 0009 INFORMATION")
+            print_info_table(tail_info, "TAIL INFORMATION")
+            print_info_table(fuselage_info, "FUSELAGE INFORMATION")
+        else:
+            logging.info("Log level above this method. Please set log level to 1 to print full aircraft information.")
 
     # Simulation Methods
     def simulate(self, alpha_deg, del_e_deg, Re_c, h):
@@ -144,7 +175,7 @@ class Aircraft:
         CL = CL_wing + CL_tail
         CD = CD_wing + CD_tail + CD_fuselage
         CM = CM_wing + CM_tail + CM_fuselage
-
+        '''
         if self._log_level == 1:
             wing_info = {
                 "Wing Span": self._wing.get_span_m(),
@@ -154,7 +185,7 @@ class Aircraft:
                 "CD Wing": CD_wing,
                 "CM Wing": CM_wing
             }
-            NACA_2415_info = self._wing.get_NACA().export_variables_to_dict()
+            NACA_wing_info = self._wing.get_NACA().export_variables_to_dict()
 
             tail_info = {
                 "Tail Span": self._tail.get_span_m(),
@@ -165,18 +196,18 @@ class Aircraft:
                 "CD Tail": CD_tail,
                 "CM Tail": CM_tail,
             }
-            NACA_0009_info = self._tail.get_NACA().export_variables_to_dict()
+            NACA_tail_info = self._tail.get_NACA().export_variables_to_dict()
 
             fuselage_info = {
-                "Fuselage Length": self._fuselage.get_length(),
-                "Fuselage Height": self._fuselage.get_height(),
+                "Fuselage Length": self._fuselage.get_length_m(),
+                "Fuselage Height": self._fuselage.get_height_m(),
                 "CD Fuselage": CD_fuselage,
                 "CM Fuselage": CM_fuselage,
             }
             
-            print_info_table(NACA_2415_info, "NACA 2415 INFORMATION")
+            print_info_table(NACA_wing_info, f"NACA {self._wing.get_NACA()._wing_type} INFORMATION")
             print_info_table(wing_info, "WING INFORMATION")
-            print_info_table(NACA_0009_info, "NACA 0009 INFORMATION")
+            print_info_table(NACA_tail_info, "NACA 0009 INFORMATION")
             print_info_table(tail_info, "TAIL INFORMATION")
             print_info_table(fuselage_info, "FUSELAGE INFORMATION")
         
@@ -184,7 +215,7 @@ class Aircraft:
             logging.info(f"Total CL: {CL}")
             logging.info(f"Total CD: {CD}")
             logging.info(f"Total CM: {CM}")
-
+        '''
         # NOTE: PAY ATTENTION TO RETURN ORDER HERE!!
         return AeroCoefficients(CL=CL, CD=CD, CM=CM)
     
@@ -288,7 +319,6 @@ class Aircraft:
         trimmed_data = []
         for alpha_deg in alpha_range:
             f_CM = lambda del_e_deg: self.simulate(alpha_deg, del_e_deg, Re_c, h)[-1]  # Access CM directly
-            print(f_CM)
             del_e_deg_trim = fsolve(f_CM, 0)[0]
             # Now unpack the returned values in the order of CL, CD, CM
             result = self.simulate(alpha_deg, del_e_deg_trim, Re_c, h)
@@ -366,8 +396,6 @@ class Aircraft:
         return ( self._Wp / (1 - self._Wf_over_W0 - self._We_over_W0))
     
     def find_Wp(self):
-        print(self._Wf_over_W0)
-        print(self._We_over_W0)
         return (1 - self._Wf_over_W0 - self._We_over_W0) * self._W0
     
     def find_wing_surface_area(self, rho, V, CL):
