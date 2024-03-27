@@ -1,3 +1,5 @@
+import math
+
 import logging
 from src.settings import *
 
@@ -97,26 +99,27 @@ class Simulate():
 
         return min_CL_max, min_delta_e_deg
 
-    def simulate_landing(test_measurements, CL_max, Cd0, K, wing_surface_area_m, landing_velocity_ms):
+    def simulate_landing(test_measurements, CL_max, Cd0, K, wing_surface_area_m, runway_length):
         CL_max_for_landing = 0.9 * CL_max
+        landing_velocity_ms = math.sqrt((2*7.5*9.81)/(CL_max*1.225*wing_surface_area_m))
 
         # Find landing lift
         landing_lift = (CL_max_for_landing * test_measurements["Test Air Density (kg/m^3)"] * (landing_velocity_ms**2) * wing_surface_area_m) / 2
 
-        # Find landing drag (parasitic + induced)
-        # parasitic drag
+        # Find landing drag
         const = 0.5 * test_measurements["Test Air Density (kg/m^3)"] * (landing_velocity_ms**2) * wing_surface_area_m
-        Dp = Cd0 * const
-        # induced drag
-        Di = ((CL_max_for_landing**2)/K) * const
-        complex_landing_drag = Dp + Di
-
-        # Simplified drag
         landing_drag = Cd0 * const
 
         # Find landing deceleartion
-        F_net = landing_drag - landing_lift
-        landing_deceleration = F_net / (landing_lift / test_measurements["Force of Gravity (m/s^2)"])
+        #F_net = landing_drag - landing_lift
+        #landing_deceleration = F_net / (landing_lift / test_measurements["Force of Gravity (m/s^2)"])
+    
+        # TODO: Find landing velocity
+        
+        landing_deceleration = (landing_velocity_ms**2) / (2*runway_length)
+        print(landing_deceleration)
 
-        return landing_lift, landing_drag, landing_deceleration
+        return landing_lift, landing_drag, landing_velocity_ms, landing_deceleration
 
+
+    # TODO: find cl needed for 0.4g deceleration

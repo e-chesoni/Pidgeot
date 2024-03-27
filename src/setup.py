@@ -15,7 +15,7 @@ test_measurements = {
     "Test Alpha (degrees)": 30, # NOTE: for main impl: alpha range -30 to 30 (-0.524 - 0.524 in rads) intervals of 5
     "Test Alpha Range (degrees)": np.linspace(-10, 30, 21),
     "Test Delta_e (degrees)": 20,
-    "Test Delta_e List (degrees)": [-19, -15, -10, -5, 0], # NOTE: was [0, 5, 10] for hw4
+    "Test Delta_e List (degrees)": [0, 5, 10], # NOTE: was [0, 5, 10] for hw4
     "Test Reynolds Number": 6e5,
     "Test h": 0.25,
     "Test i_h (meters)": 0,
