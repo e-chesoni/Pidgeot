@@ -60,4 +60,4 @@ V_m_per_s = 45 # NOTE: Requirement is 100mph ~ 44.7 m/s
 
 # Landing Setup
 landing_runway_length_m = in_to_meters(200)
-#CL_max_flap = math.sqrt(CD_trimmed / K_trimmed)
+landing_velocity_ms = 45 # m/s

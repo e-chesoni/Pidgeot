@@ -60,7 +60,9 @@ def run_hw6_simulation():
         print_info_table(test_measurements, "TEST MEASUREMENTS INFORMATION")
     
     # Run simulation to get CL max, Cd0, and K
-    uav_simulator_settings.set_plots(False) # Disable plots; not needed for hw6
+    uav_simulator_settings.set_plots(True) # NOTE: Currently must use plots to vary delta
+    uav_simulator_settings.set_apply_stall_model(False)
+    uav_simulator_settings.set_delta_deflection_down(False) # we do this for the landing calcuation later; delta deflecting up slows the plane down
     CL_max, Cd0, K = Simulate.run_aircraft_simulation(highway_pursuit, test_measurements, wing_surface_area_m, tail_surface_area_m, wing_chord_m)
 
     # Run weight simulation
@@ -75,21 +77,31 @@ def run_hw6_simulation():
     highway_pursuit.set_wing_surface_area_m(highway_pursuit.find_wing_surface_area(test_measurements["Test Air Density (kg/m^3)"], V_m_per_s, CL_test)) # TODO: try flying at a lower CL
     hp_wing_length, hp_wing_width = highway_pursuit.calculate_wing_dimensions_m()
 
+    # Run simulation to find landing speed
+    # TODO: Package this as a simulation
+    # NOTE: You also have calculated cl_max from simulation above
+    CL_max_for_landing = (0.9) * CL_max # NOTE: Told to take 0.9 of CL_max in problem statement
+
+    landing_lift, landing_drag, landing_deceleration = Simulate.simulate_landing(test_measurements, CL_max, Cd0, K, wing_surface_area_m, landing_velocity_ms)
+
     if DEBUG:
-        hp_info = {
+        hp_weight_info = {
             "Total Weight (kg)": highway_pursuit.get_W0(),
             "Payload Weight (kg)": highway_pursuit.get_Wp(),
             "Wing Surface Area (meters)": highway_pursuit.get_wing_surface_area_m(),
             "Potential Wing Length (meters)": hp_wing_length,
             "Potential Wing Width (meters)": hp_wing_width,
         }
-        print_info_table(hp_info, "HIGHWAY PURSUIT UAV INFORMATION")
+        print_info_table(hp_weight_info, "HIGHWAY PURSUIT WEIGHT-IN")
 
-    # Run simulation to find landing speed
-    # TODO: Package this as a simulation
-    # NOTE: You also have calculated cl_max from simulation above
-    CL_max_test = (0.9) * math.sqrt(Cd0/K) # NOTE: Told to take 0.9 of CL_max in problem statement
+        hp_landing_info = {
+            "CL Max": CL_max,
+            "CL Max for Landing": CL_max_for_landing,
+            "Landing Lift (N)": landing_lift,
+            "Landing Drag (N)": landing_drag,
+            "Required Deceleration (m/s^2)": landing_deceleration
+        }
+        print_info_table(hp_landing_info, "HIGHWAY PURSUIT LANDING INFORMATION")
 
-    # Find L an D
 
 

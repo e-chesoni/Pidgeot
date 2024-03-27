@@ -2,6 +2,7 @@ from src.wing import *
 from src.tail import *
 from src.fuselage import *
 from util.uav_logger import *
+from src.settings import *
 from src.setup import *
 
 from collections import namedtuple
@@ -145,16 +146,19 @@ class Aircraft:
         alpha_rad = deg_to_rad(alpha_deg)
         critical_alpha_rad = deg_to_rad(self._critical_angle_of_attack)
         
-        # NOTE: Testing stall model for drag polar
-        # Adjust CL calculation for stall behavior
-        if alpha_rad <= critical_alpha_rad:
-            CL_wing = self._wing.find_CL_NACA(alpha_rad)
+        # TODO: FIX stall model for drag polar
+        if uav_simulator_settings.get_apply_stall_model():
+            # Adjust CL calculation for stall behavior
+            if alpha_rad <= critical_alpha_rad:
+                CL_wing = self._wing.find_CL_NACA(alpha_rad)
+            else:
+                # Simplified stall behavior: CL starts to decrease or remains constant
+                # This is a placeholder; adjust based on your stall model
+                #decrease_factor = 5 * (alpha_rad - critical_alpha_rad)
+                decrease_factor = 0
+                CL_wing = self._wing.find_CL_NACA(critical_alpha_rad) - decrease_factor
         else:
-            # Simplified stall behavior: CL starts to decrease or remains constant
-            # This is a placeholder; adjust based on your stall model
-            #decrease_factor = 5 * (alpha_rad - critical_alpha_rad)
-            decrease_factor = 0
-            CL_wing = self._wing.find_CL_NACA(critical_alpha_rad) - decrease_factor
+            CL_wing = self._wing.find_CL_NACA(alpha_rad)
 
         CD_wing = self._wing.find_CD(CL_wing)
         CM_wing = self._wing.find_CM(h)
@@ -195,7 +199,11 @@ class Aircraft:
         palette_1 = [dark_blue, navy, teal]
         palette_2 = [yellow, burnt_orange, dark_red]
 
+        # TODO: remove when dict method works
         cl_max_list = []
+
+        # Initialize an empty dictionary to store CL_max angles and delta degrees
+        cl_max_delta_e_dict = {}
         
         plt.figure(figsize=(12, 12))
 
@@ -233,7 +241,10 @@ class Aircraft:
             # For each del_e_deg, find CL at the critical angle
             for i, del_e_deg in enumerate(del_e_degs):
                 CL_at_crit_angle = self.simulate(crit_angle, del_e_deg, Re_c, h)[0]
+                # TODO: remove when dict works
                 cl_max_list.append(CL_at_crit_angle)
+
+                cl_max_delta_e_dict[CL_at_crit_angle] = del_e_deg
                 # Highlight CL at the critical angle on the plot
                 ax1.plot(crit_angle, CL_at_crit_angle, 'x', color='red', label=f'CL at Crit Angle, del_e={del_e_deg}')
 
@@ -273,7 +284,7 @@ class Aircraft:
         plt.tight_layout()
         plt.show()
 
-        return cl_max_list
+        return cl_max_delta_e_dict
 
     def find_drag_polar_cl_max_list(self, alpha_range, del_e_degs, Re_c, h):
         """
