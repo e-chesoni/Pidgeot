@@ -61,7 +61,7 @@ def run_hw6_simulation():
         print_info_table(test_measurements, "TEST MEASUREMENTS INFORMATION")
     
     # Run simulation to get CL max, Cd0, and K
-    uav_simulator_settings.set_plots(False)
+    uav_simulator_settings.set_plots(True)
     uav_simulator_settings.set_apply_stall_model(False)
     #uav_simulator_settings.set_delta_deflection_down(False) # we do this for the landing calcuation later; delta deflecting up slows the plane down
     CL_max, Cd0, K = Simulate.run_aircraft_simulation(highway_pursuit, test_measurements, wing_surface_area_m, tail_surface_area_m, wing_chord_m)
@@ -85,7 +85,7 @@ def run_hw6_simulation():
 
     #landing_lift, landing_drag, landing_deceleration = Simulate.simulate_landing(test_measurements, CL_max, Cd0, K, wing_surface_area_m, landing_velocity_ms)
     # NOTE: For + flap, use cl max = 2.8 (from graph)
-    landing_lift, landing_drag, landing_velocity_ms, landing_deceleration = Simulate.simulate_landing(test_measurements, CL_max, Cd0, K, wing_surface_area_m, landing_runway_length_m)
+    landing_lift, landing_drag, landing_velocity_ms, landing_deceleration = Simulate.simulate_landing(test_measurements, CL_max, Cd0, total_weight_kg, wing_surface_area_m, landing_runway_length_m)
 
     # Run simulation for tail sizing
     # TODO: Use tail volume equation
