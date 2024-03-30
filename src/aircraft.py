@@ -24,12 +24,13 @@ red = '#ae2012'
 dark_red = '#9b2226'
 
 class Aircraft:
-    def __init__(self, name, wing, tail, fuselage):
+    def __init__(self, name, wing, tail, fuselage, motor=None):
         logging.info(f"Aircraft named \"{name}\" created")
         self._name = name
         self._wing = wing
         self._tail = tail
         self._fuselage = fuselage
+        self._motor = motor
     
     # Logging
     def enable_debug(self, debug):
@@ -39,6 +40,9 @@ class Aircraft:
         self._log_level = level
     
     # Getters
+    def get_motor(self):
+        return self._motor
+
     def get_weight(self):
         return self._weight
 
@@ -49,6 +53,9 @@ class Aircraft:
         return self._wing_surface_area_m
     
     # Setters
+    def set_motor(self, motor):
+        self._motor = motor
+
     def set_units(self, units):
         self._units = units
 
@@ -318,9 +325,7 @@ class Aircraft:
     
     def find_thrust_power(self, V, rho):
         trimmed_CL = self.find_trimmed_CL(self._weight, rho, V)
-        logging.info(f"aircraft::find_thrust_power -- Recalculating trimmed CL: {trimmed_CL}")
         trimmed_CD = self.find_trimmed_drag(trimmed_CL)
-        logging.info(f"aircraft::find_thrust_power -- Recalculating trimmed CD: {trimmed_CD}")
         D = 0.5 * rho * (V**2) * self._wing_surface_area_m * trimmed_CD  # Drag = Thurst at cruise
         P = D * V  # Power
         return D, P

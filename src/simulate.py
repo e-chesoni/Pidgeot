@@ -1,6 +1,7 @@
 import math
 
 import logging
+from util.helpers import *
 from src.settings import *
 
 
@@ -126,13 +127,22 @@ class Simulate():
 
         return V_tail_horizontal, V_tail_vertical
     
-    def simulate_propeller_performance(test_measurements, test_propeller, working_velocity, wing_surface_area_m, Cd0):
-        n = 0
-        D = 0.5 * test_measurements["Test Air Density (kg/m^3)"] * (working_velocity**2) * wing_surface_area_m * Cd0
-        TR = D # At cruise, required Trust = Drag
+    def simulate_required_RPM(aircraft, test_measurements, test_motor, V_m_per_s):
+        # Find required thrust at cruise
+        Tr_cruise, Pr_cruise = aircraft.find_thrust_power(V_m_per_s, test_measurements["Test Air Density (kg/m^3)"])
 
-        # TODO: Find Q
-        Q = test_propeller.get_Q()
-        
-        omega = (TR * working_velocity) / Q
-        return n # RPM
+        # TODO: Find i_curr (motor current current)
+        # For now, assume cruising current (i) of 2 amperes
+        i_curr = 2  # in amperes
+        Qm = aircraft.get_motor().calculate_Q(i_curr) # Q is the torque on the motor shaft from the coil
+        omega = aircraft.get_motor().calculate_omega(Pr_cruise, Qm)
+        required_rpm = rads_to_rpm(omega) # NOTE: The required RPM is way too high!
+        required_battery_power = Qm * required_rpm
+        required_voltage = required_battery_power / test_motor["i_0"] # volts
+        '''
+        NOTE: The current drawn can appear relatively low because the power (watts) is the product of voltage and current (P = V * I). 
+            Therefore, even with a relatively low current, the high voltage results in a significant power requirement.
+        '''
+        current_draw = required_battery_power / required_voltage  # in amperes
+
+        return Tr_cruise, Pr_cruise, required_rpm, required_battery_power, required_voltage, current_draw

@@ -15,12 +15,19 @@ hw_round = 6
 NACA_file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'NACA.json'))
 aircraft_file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'aircrafts.json'))
 propeller_file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'propellers.json'))
+motor_file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'motors.json'))
+
 
 # Load both JSON files
-with open(NACA_file_path, 'r') as naca_file, open(aircraft_file_path, 'r') as aircraft_file, open(propeller_file_path, 'r') as propeller_file:
+with open(NACA_file_path, 'r') as naca_file, \
+     open(aircraft_file_path, 'r') as aircraft_file, \
+     open(propeller_file_path, 'r') as propeller_file, \
+     open(motor_file_path, 'r') as motor_file:
     naca_data = json.load(naca_file)
     aircraft_data = json.load(aircraft_file)
     propeller_data = json.load(propeller_file)
+    motor_data = json.load(motor_file)
+
 
 # Extract wing parameters
 wing_span_m = aircraft_data["highway_pursuit"]["wing"]["span_m"]
@@ -70,3 +77,6 @@ propeller_data = propeller_data['PKZ1005']
 
 # Creating a DataFrame
 propeller_df = pd.DataFrame(propeller_data)
+
+# Motor setup
+test_motor = motor_data["480-DC-Motor"]

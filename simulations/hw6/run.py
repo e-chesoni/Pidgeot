@@ -15,6 +15,7 @@ from src.aircraft import *
 from src.wing import *
 from src.tail import *
 from src.fuselage import *
+from src.motor import *
 from src.propeller import *
 
 
@@ -49,8 +50,11 @@ highway_pursuit_fuselage = Fuselage()
 highway_pursuit_fuselage.set_length_m(fuselage_length_m)
 highway_pursuit_fuselage.set_height_m(fuselage_height_m)
 
+# MOTOR
+highway_pursuit_motor = Motor(test_motor["Km"], test_motor["Rm"], test_motor["i_0"])
+
 # Create aircraft
-highway_pursuit = Aircraft("Highway Pursuit", highway_pursuit_wing, highway_pursuit_tail, highway_pursuit_fuselage)
+highway_pursuit = Aircraft("Highway Pursuit", highway_pursuit_wing, highway_pursuit_tail, highway_pursuit_fuselage, highway_pursuit_motor)
 
 def run_hw6_simulation():
     if DEBUG:
@@ -97,31 +101,9 @@ def run_hw6_simulation():
     # TODO: Use tail volume equation
     V_tail_horizontal, V_tail_vertical = Simulate.simulate_tail_sizing(tail_chord_m, tail_span_m, tail_surface_area_m, wing_to_tail_dist_m)
 
-
-    # Setup Propeller simulation
-    logging.info(f"Setting up for propeller simulation...")
-
-    # Create a polynomial fit for the Thrust coefficient [CT] and Power coefficient [CP] data for a propeller
-    # Set degree of polynomial
-    poly_degree = 2  # NOTE: use 2 for quadratic, 3 for cubic (life = harder if you use cubic)
-
-    # Fit polynomial to CT vs J
-    coeffs_ct = np.polyfit(propeller_df['J'], propeller_df['CT'], poly_degree)
-    poly_ct = np.poly1d(coeffs_ct)
-
-    # Fit a polynomial to CP vs J
-    coeffs_cp = np.polyfit(propeller_df['J'], propeller_df['CP'], poly_degree)
-    poly_cp = np.poly1d(coeffs_cp)
-
-    # Find required thrust at cruise
-    Tr_cruise, Pr_cruise = highway_pursuit.find_thrust_power(V_m_per_s, test_measurements["Test Air Density (kg/m^3)"])
-    
-
-    # Create a Propeller
-
-    #highway_pursuit_propeller = Propeller()
-
-
+    # Setup Propeller/Motor simulation
+    logging.info(f"Setting up for propeller / motor simulation...")
+    Tr_cruise, Pr_cruise, required_rpm, required_battery_power, required_voltage, current_draw = Simulate.simulate_required_RPM(highway_pursuit, test_measurements, test_motor, V_m_per_s)
 
     if DEBUG:
         hp_weight_info = {
@@ -154,8 +136,14 @@ def run_hw6_simulation():
             "Propeller Name": propeller_data["name"],
             "Required Thrust at Cruise (N)": Tr_cruise, # NOTE: 1 newton ~ 100 grams
             "Required Power at Cruise (Watts)": Pr_cruise,
+            "IMPOSSIBLE Required RPM": required_rpm,
+            "IMPOSSIBLE Required Battery Power (Watts)": required_battery_power,
+            "IMPOSSIBLE Required Voltage (Volts)": required_voltage,
+            "Current Drawn (Amps)": current_draw,
         }
         print_info_table(hp_propeller_info, "HIGHWAY PURSUIT TAIL SIZING INFORMATION")
+
+        logging.info("Conclusion: Required RPM is way too high (something like 8000 would be more realistic).\n Switch to gas.")
 
 
 

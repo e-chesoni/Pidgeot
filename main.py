@@ -26,7 +26,7 @@ logging.info(f"Log level: {logging.getLogger().getEffectiveLevel()}")
 # Set Matplotlib logging level to suppress debug logs
 logging.getLogger('matplotlib').setLevel(logging.WARNING)
 
-#run_hw4_simulation()
+run_hw4_simulation()
 #run_hw5_simulation()
 run_hw6_simulation()
 

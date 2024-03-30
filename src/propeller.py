@@ -1,12 +1,8 @@
 from util.helpers import *
 
 class Propeller:
-    def __init__(self, d, Q, K, i, i_0) -> None:
+    def __init__(self, d) -> None:
         self._d = d
-        self._Q = Q
-        self._K = K
-        self._i = i
-        self._i_0 = i_0
 
     # Setters
     def set_diameter(self, d):
