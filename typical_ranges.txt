@@ -13,3 +13,8 @@ Tail sizing
 - 0.3 - 0.1
 
 Want full plane cg close to quarter chord on wing
+
+HW 7 matrix mistakes
+- opposite sines
+- 1,1 element (diagonal are damping -- should all be negative) 
+- 2,1 element on b is also wrong

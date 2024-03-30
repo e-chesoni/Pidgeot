@@ -15,6 +15,7 @@ from src.aircraft import *
 from src.wing import *
 from src.tail import *
 from src.fuselage import *
+from src.propeller import *
 
 
 # Set DEBUG option
@@ -65,20 +66,24 @@ def run_hw6_simulation():
     uav_simulator_settings.set_apply_stall_model(False)
     #uav_simulator_settings.set_delta_deflection_down(False) # we do this for the landing calcuation later; delta deflecting up slows the plane down
     CL_max, Cd0, K = Simulate.run_aircraft_simulation(highway_pursuit, test_measurements, wing_surface_area_m, tail_surface_area_m, wing_chord_m)
+    highway_pursuit.set_trimmed_drag_polar_coefficients(Cd0, K)
 
     # Run weight simulation
+    logging.info(f"Setting up for weight simulation...")
     # TODO: Package this as a simulation
     # Weight Calcuations
-    highway_pursuit.set_W0(total_weight_kg)
+    highway_pursuit.set_weight(total_weight_kg) # W0 = total weight
     highway_pursuit.set_We_over_W0(We_over_W0)
     highway_pursuit.set_Wf_over_W0(highway_pursuit.find_Wf_over_W0(Range_km, H_F_km, L_over_D_cruise, eta_p))
     highway_pursuit.set_Wp(highway_pursuit.find_Wp())
 
-    highway_pursuit.set_trimmed_drag_polar_coefficients(CD_trimmed, K_trimmed)
+    # Wing dimensions
     highway_pursuit.set_wing_surface_area_m(highway_pursuit.find_wing_surface_area(test_measurements["Test Air Density (kg/m^3)"], V_m_per_s, CL_test)) # TODO: try flying at a lower CL
     hp_wing_length, hp_wing_width = highway_pursuit.calculate_wing_dimensions_m()
 
+    # SIMULATION SETUP
     # Run simulation to find landing speed
+    logging.info(f"Setting up for landing simulation...")
     # TODO: Package this as a simulation
     # NOTE: You also have calculated cl_max from simulation above
     CL_max_for_landing = (0.9) * CL_max # NOTE: Told to take 0.9 of CL_max in problem statement    
@@ -88,15 +93,44 @@ def run_hw6_simulation():
     landing_lift, landing_drag, landing_velocity_ms, landing_deceleration = Simulate.simulate_landing(test_measurements, CL_max, Cd0, total_weight_kg, wing_surface_area_m, landing_runway_length_m)
 
     # Run simulation for tail sizing
+    logging.info(f"Setting up for tail sizing simulation...")
     # TODO: Use tail volume equation
+    V_tail_horizontal, V_tail_vertical = Simulate.simulate_tail_sizing(tail_chord_m, tail_span_m, tail_surface_area_m, wing_to_tail_dist_m)
+
+
+    # Setup Propeller simulation
+    logging.info(f"Setting up for propeller simulation...")
+
+    # Create a polynomial fit for the Thrust coefficient [CT] and Power coefficient [CP] data for a propeller
+    # Set degree of polynomial
+    poly_degree = 2  # NOTE: use 2 for quadratic, 3 for cubic (life = harder if you use cubic)
+
+    # Fit polynomial to CT vs J
+    coeffs_ct = np.polyfit(propeller_df['J'], propeller_df['CT'], poly_degree)
+    poly_ct = np.poly1d(coeffs_ct)
+
+    # Fit a polynomial to CP vs J
+    coeffs_cp = np.polyfit(propeller_df['J'], propeller_df['CP'], poly_degree)
+    poly_cp = np.poly1d(coeffs_cp)
+
+    # Find required thrust at cruise
+    Tr_cruise, Pr_cruise = highway_pursuit.find_thrust_power(V_m_per_s, test_measurements["Test Air Density (kg/m^3)"])
+    
+
+    # Create a Propeller
+
+    #highway_pursuit_propeller = Propeller()
+
+
 
     if DEBUG:
         hp_weight_info = {
-            "Total Weight (kg)": highway_pursuit.get_W0(),
+            "Total Weight (kg)": highway_pursuit.get_weight(),
             "Payload Weight (kg)": highway_pursuit.get_Wp(),
             "Wing Surface Area (meters)": highway_pursuit.get_wing_surface_area_m(),
             "Potential Wing Length (meters)": hp_wing_length,
             "Potential Wing Width (meters)": hp_wing_width,
+            "Cruise Velocity [USER SET] (m/s)": V_m_per_s,
         }
         print_info_table(hp_weight_info, "HIGHWAY PURSUIT WEIGHT-IN")
 
@@ -106,9 +140,22 @@ def run_hw6_simulation():
             "Landing Lift (N)": landing_lift,
             "Landing Drag (N)": landing_drag,
             "Landing Velocity (ms)": landing_velocity_ms,
-            "Required Deceleration (m/s^2)": landing_deceleration
+            "Required Deceleration (m/s^2)": landing_deceleration,
         }
         print_info_table(hp_landing_info, "HIGHWAY PURSUIT LANDING INFORMATION")
+
+        hp_tail_sizing_info = {
+            "Tail Volume Horizontal": V_tail_horizontal,
+            "Tail Volume Vertical": V_tail_vertical,
+        }
+        print_info_table(hp_tail_sizing_info, "HIGHWAY PURSUIT TAIL SIZING INFORMATION")
+
+        hp_propeller_info = {
+            "Propeller Name": propeller_data["name"],
+            "Required Thrust at Cruise (N)": Tr_cruise, # NOTE: 1 newton ~ 100 grams
+            "Required Power at Cruise (Watts)": Pr_cruise,
+        }
+        print_info_table(hp_propeller_info, "HIGHWAY PURSUIT TAIL SIZING INFORMATION")
 
 
 

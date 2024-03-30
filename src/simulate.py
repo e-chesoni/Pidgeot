@@ -47,14 +47,8 @@ class Simulate():
             
             for c, d in cl_max_delta_e_dict.items():
                 logging.info(f"CL_max: {c}, Delta_e_deg: {d}")
-
-            if uav_simulator_settings.get_delta_deflection_down():
-                logging.info(f"Deflecting delta_e down in simulate.py")
-                CL_max, delta_e_deg = Simulate.find_cl_max_delta_e(cl_max_delta_e_dict)
-
-            else:
-                logging.info(f"Deflecting delta_e up (slowing down for landing) in simulate.py")
-                CL_max, delta_e_deg = Simulate.find_cl_min_delta_e(cl_max_delta_e_dict)
+            
+            CL_max, delta_e_deg = Simulate.find_cl_max_delta_e(cl_max_delta_e_dict)
         
         else:
             CL_max = aircraft.find_cl_max(Cd0, K)
@@ -103,7 +97,7 @@ class Simulate():
         CL_max_for_landing = 0.9 * CL_max
 
         # Find landing velocity
-        landing_velocity_ms = math.sqrt((2 * 7.5 * test_measurements["Force of Gravity (m/s^2)"])/(CL_max * test_measurements["Test Air Density (kg/m^3)"] * wing_surface_area_m))
+        landing_velocity_ms = math.sqrt((2 * weight * test_measurements["Force of Gravity (m/s^2)"])/(CL_max * test_measurements["Test Air Density (kg/m^3)"] * wing_surface_area_m))
 
         # Find landing lift
         landing_lift = (CL_max_for_landing * test_measurements["Test Air Density (kg/m^3)"] * (landing_velocity_ms**2) * wing_surface_area_m) / 2
@@ -116,3 +110,29 @@ class Simulate():
         landing_deceleration = (landing_velocity_ms**2) / (2*runway_length)
 
         return landing_lift, landing_drag, landing_velocity_ms, landing_deceleration
+
+    # TODO: Is this true?
+    # CG is influenced by wing_to_tail_dist_m; this is the distance from wing CG to tail CG
+    def simulate_tail_sizing(tail_span_m, tail_chord_m, tail_surface_area_m, wing_to_tail_dist_m):
+        V_tail_horizontal = None
+        V_tail_vertical = None
+        
+        V_denom = tail_chord_m * tail_surface_area_m
+
+        V_tail_horizontal = ( wing_to_tail_dist_m * tail_span_m ) / ( V_denom )
+        l_v = 0.1
+        S_v = 0.2
+        V_tail_vertical = ( l_v * S_v ) / ( V_denom )
+
+        return V_tail_horizontal, V_tail_vertical
+    
+    def simulate_propeller_performance(test_measurements, test_propeller, working_velocity, wing_surface_area_m, Cd0):
+        n = 0
+        D = 0.5 * test_measurements["Test Air Density (kg/m^3)"] * (working_velocity**2) * wing_surface_area_m * Cd0
+        TR = D # At cruise, required Trust = Drag
+
+        # TODO: Find Q
+        Q = test_propeller.get_Q()
+        
+        omega = (TR * working_velocity) / Q
+        return n # RPM

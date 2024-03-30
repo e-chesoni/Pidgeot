@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import json
 import os
 
@@ -13,11 +14,13 @@ hw_round = 6
 
 NACA_file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'NACA.json'))
 aircraft_file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'aircrafts.json'))
+propeller_file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'propellers.json'))
 
 # Load both JSON files
-with open(NACA_file_path, 'r') as naca_file, open(aircraft_file_path, 'r') as aircraft_file:
+with open(NACA_file_path, 'r') as naca_file, open(aircraft_file_path, 'r') as aircraft_file, open(propeller_file_path, 'r') as propeller_file:
     naca_data = json.load(naca_file)
     aircraft_data = json.load(aircraft_file)
+    propeller_data = json.load(propeller_file)
 
 # Extract wing parameters
 wing_span_m = aircraft_data["highway_pursuit"]["wing"]["span_m"]
@@ -60,4 +63,10 @@ V_m_per_s = 45 # NOTE: Requirement is 100mph ~ 44.7 m/s
 
 # Landing Setup
 landing_runway_length_m = ft_to_meters(200)
-#landing_velocity_ms = 45 # m/s
+
+# Propeller setup
+# Extracting data for PKZ1005
+propeller_data = propeller_data['PKZ1005']
+
+# Creating a DataFrame
+propeller_df = pd.DataFrame(propeller_data)

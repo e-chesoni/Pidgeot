@@ -39,9 +39,9 @@ class Aircraft:
         self._log_level = level
     
     # Getters
-    def get_W0(self):
-        return self._W0
-    
+    def get_weight(self):
+        return self._weight
+
     def get_Wp(self):
         return self._Wp
     
@@ -76,7 +76,7 @@ class Aircraft:
     def set_wing_chord_m(self, wing_chord_m):
         self._wing_chord_m = wing_chord_m
 
-    def set_weight(self, weight):
+    def set_weight(self, weight): # W0
         self._weight = weight
 
     def set_critical_angle_of_attack(self, crit_angle):
@@ -97,41 +97,10 @@ class Aircraft:
     # Wp = payload weight
     def set_Wp(self, Wp):
         self._Wp = Wp
-    
+    '''
     def set_W0(self, W0):
         self._W0 = W0
-        
-    # Print methods
-    def print_aircraft_info(self):
-        if self._log_level == 1:
-            wing_info = {
-                "Wing Span": self._wing.get_span_m(),
-                "Wing Chord": self._wing.get_chord_m(),
-                "Wing Center of Gravity": self._wing.get_center_of_gravity(),
-            }
-            NACA_wing_info = self._wing.get_NACA().export_variables_to_dict()
-
-            tail_info = {
-                "Tail Span": self._tail.get_span_m(),
-                "Tail Chord": self._tail.get_chord_m(),
-                "Tail Epsilon": self._tail.get_epsilon(),
-                "Tail Tau": self._tail.get_tau(),
-            }
-            NACA_tail_info = self._tail.get_NACA().export_variables_to_dict()
-
-            fuselage_info = {
-                "Fuselage Length": self._fuselage.get_length_m(),
-                "Fuselage Height": self._fuselage.get_height_m(),
-            }
-            
-            print_info_table(NACA_wing_info, f"NACA {self._wing.get_NACA()._wing_type} INFORMATION")
-            print_info_table(wing_info, "WING INFORMATION")
-            print_info_table(NACA_tail_info, "NACA 0009 INFORMATION")
-            print_info_table(tail_info, "TAIL INFORMATION")
-            print_info_table(fuselage_info, "FUSELAGE INFORMATION")
-        else:
-            logging.info("Log level above this method. Please set log level to 1 to print full aircraft information.")
-
+    '''    
     # Simulation Methods
     def simulate(self, alpha_deg, del_e_deg, Re_c, h):
         required_attributes = ['_wing', '_tail', '_fuselage', '_i_h', '_tail_surface_area_m', '_wing_surface_area_m', '_wing_chord_m']
@@ -345,12 +314,14 @@ class Aircraft:
         return (2 * weight * g) / (rho * V**2 * self._wing_surface_area_m)
 
     def find_trimmed_drag(self, CL):
-        return self._Cd0 + self._K * CL**2
+        return self._Cd0 + (self._K * CL**2)
     
     def find_thrust_power(self, V, rho):
         trimmed_CL = self.find_trimmed_CL(self._weight, rho, V)
+        logging.info(f"aircraft::find_thrust_power -- Recalculating trimmed CL: {trimmed_CL}")
         trimmed_CD = self.find_trimmed_drag(trimmed_CL)
-        D = 0.5 * rho * V**2 * self._wing_surface_area_m * trimmed_CD  # Drag = Thurst
+        logging.info(f"aircraft::find_thrust_power -- Recalculating trimmed CD: {trimmed_CD}")
+        D = 0.5 * rho * (V**2) * self._wing_surface_area_m * trimmed_CD  # Drag = Thurst at cruise
         P = D * V  # Power
         return D, P
     
@@ -398,11 +369,11 @@ class Aircraft:
         return ( self._Wp / (1 - self._Wf_over_W0 - self._We_over_W0))
     
     def find_Wp(self):
-        return (1 - self._Wf_over_W0 - self._We_over_W0) * self._W0
+        return (1 - self._Wf_over_W0 - self._We_over_W0) * self._weight
     
     def find_wing_surface_area(self, rho, V, CL):
         g = 9.81
-        return ( ( 2 * self._W0 * g) / ( rho * (V**2) * CL ) )
+        return ( ( 2 * self._weight * g) / ( rho * (V**2) * CL ) )
     
     def calculate_wing_dimensions_m(self):
         # Define a l/w ratio for the wing
@@ -416,3 +387,33 @@ class Aircraft:
 
         return length, width
 
+        # Print methods
+    def print_aircraft_info(self):
+        if self._log_level == 1:
+            wing_info = {
+                "Wing Span": self._wing.get_span_m(),
+                "Wing Chord": self._wing.get_chord_m(),
+                "Wing Center of Gravity": self._wing.get_center_of_gravity(),
+            }
+            NACA_wing_info = self._wing.get_NACA().export_variables_to_dict()
+
+            tail_info = {
+                "Tail Span": self._tail.get_span_m(),
+                "Tail Chord": self._tail.get_chord_m(),
+                "Tail Epsilon": self._tail.get_epsilon(),
+                "Tail Tau": self._tail.get_tau(),
+            }
+            NACA_tail_info = self._tail.get_NACA().export_variables_to_dict()
+
+            fuselage_info = {
+                "Fuselage Length": self._fuselage.get_length_m(),
+                "Fuselage Height": self._fuselage.get_height_m(),
+            }
+            
+            print_info_table(NACA_wing_info, f"NACA {self._wing.get_NACA()._wing_type} INFORMATION")
+            print_info_table(wing_info, "WING INFORMATION")
+            print_info_table(NACA_tail_info, "NACA 0009 INFORMATION")
+            print_info_table(tail_info, "TAIL INFORMATION")
+            print_info_table(fuselage_info, "FUSELAGE INFORMATION")
+        else:
+            logging.info("Log level above this method. Please set log level to 1 to print full aircraft information.")

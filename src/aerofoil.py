@@ -69,7 +69,7 @@ class Aerofoil:
     
     def find_CD(self, CL):
         return self.get_NACA()._Cd0 + (self.get_NACA().get_r() * (CL**2)) + ((CL**2) / (math.pi * self.get_NACA()._e * self.get_NACA()._AR))
-    
+
     # Export vairables
     def export_variables_to_dict(self):
         """
