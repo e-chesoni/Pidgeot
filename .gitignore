@@ -273,4 +273,5 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
+# Annoying Finder Files
 .DS_Store
